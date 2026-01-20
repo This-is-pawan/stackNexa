@@ -34,39 +34,50 @@ import RazorpayPayment from "./components/pages/RazorpayPayment";
 import ReceiptPage from "./components/pages/Receipt";
 
 const App = () => {
-  const { theme, auth ,Googleuser,verified} = useAppContext();
-  const currentLoading=auth?.loading||Boolean(Googleuser?.loading)
+  const { theme, auth, Googleuser, verified } = useAppContext();
+
+  const currentLoading =
+    auth?.loading || Boolean(Googleuser?.loading);
 
   if (currentLoading) return <GlobalLoading />;
-  if (currentLoading) return <GlobalLoading />;
 
-  
-const currentUser=auth?.isAuthenticated || Boolean(Googleuser?.isAuthenticated)
+  const currentUser =
+    auth?.isAuthenticated || Boolean(Googleuser?.isAuthenticated);
 
   return (
-    <div className={theme === "dark" ? "bg-black text-white" : "bg-white"}>
+    <>
       <ToastContainer
-        autoClose={3000}
-        position="top-center"
-        className="w-full sm:w-[80%] md:w-[60%] lg:w-[35%]"
+        position="top-right"
+        autoClose={2000}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
       />
-
+    <div className={theme === "dark" ? "bg-black text-white" : "bg-white"}>
+      
+    
+    
       <Navbar />
+
 
       <Routes>
         {/* ================= PUBLIC ROUTES ================= */}
-
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/login" element={verified? <Login />:<Register />} />
+        <Route
+          path="/login"
+          element={verified ? <Login /> : <Register />}
+        />
         <Route path="/user-verified" element={<UserVerified />} />
         <Route path="/razorpaypayment" element={<RazorpayPayment />} />
         <Route path="/receipt" element={<ReceiptPage />} />
+
         {/* ================= PROTECTED DASHBOARD ================= */}
         <Route
           path="/dashboard"
           element={
-           currentUser ? <Dashboard /> : <Navigate to="/login" />
+            currentUser ? <Dashboard /> : <Navigate to="/login" />
           }
         >
           <Route index element={<Overview />} />
@@ -79,20 +90,23 @@ const currentUser=auth?.isAuthenticated || Boolean(Googleuser?.isAuthenticated)
           <Route path="ecommerce" element={<Ecommerce />} />
           <Route path="saas-dashboard" element={<SassDashboard />} />
           <Route path="business-application" element={<BusinessApp />} />
+
           <Route path="setting" element={<Setting />}>
             <Route path="profile" element={<Profile />} />
             <Route path="change-password" element={<Password />} />
           </Route>
+
           <Route path="help" element={<Help />} />
           <Route path="privacy-policy" element={<Privacy />} />
           <Route path="term-condition" element={<TermCondition />} />
           <Route path="billing" element={<Billing />} />
         </Route>
-        {/* footer */}
 
+        {/* ================= FALLBACK ================= */}
         <Route path="*" element={<GlobalError />} />
       </Routes>
     </div>
+    </>
   );
 };
 
