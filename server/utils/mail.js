@@ -15,113 +15,146 @@ const sendOtpMail = async (email, name, otp) => {
       to: [{ email }],
       subject: "🔐 StackNexa | OTP Verification",
       htmlContent: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8" />
-        <title>StackNexa OTP</title>
-        <style>
-          body {
-            margin: 0;
-            padding: 0;
-            background-color: #f4f6f8;
-            font-family: Arial, Helvetica, sans-serif;
-          }
-          .container {
-            max-width: 520px;
-            margin: 40px auto;
-            background: #ffffff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-          }
-          .header {
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            padding: 24px;
-            text-align: center;
-            color: #ffffff;
-          }
-          .header h1 {
-            margin: 0;
-            font-size: 26px;
-            letter-spacing: 1px;
-             font-size: 2rem;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: 1px;
-  font-family: "Segoe UI", system-ui, sans-serif;
-          }
-          .content {
-            padding: 30px;
-            color: #333333;
-          }
-          .content h2 {
-            margin-top: 0;
-            font-size: 20px;
-          }
-          .otp-box {
-            margin: 30px 0;
-            text-align: center;
-          }
-          .otp {
-            display: inline-block;
-            background: #f1f5f9;
-            padding: 14px 28px;
-            font-size: 28px;
-            letter-spacing: 6px;
-            font-weight: bold;
-            border-radius: 8px;
-            color: #0f2027;
-          }
-          .note {
-            font-size: 14px;
-            color: #666666;
-            margin-top: 20px;
-          }
-          .footer {
-            background: #f9fafb;
-            padding: 18px;
-            text-align: center;
-            font-size: 13px;
-            color: #888888;
-          }
-          .brand {
-            color: #2c5364;
-            font-weight: bold;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>StackNexa</h1>
-          </div>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>StackNexa OTP</title>
 
-          <div class="content">
-            <h2>Hello ${name || "User"},</h2>
+  <!-- Tailwind-like utility styling (Email Safe) -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f1f5f9;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont;
+    }
 
-            <p>
-              We received a request to verify your email address.
-              Please use the OTP below to continue.
-            </p>
+    .container {
+      max-width: 520px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
 
-            <div class="otp-box">
-              <div class="otp">${otp}</div>
-            </div>
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #020617, #0f172a, #1e3a8a);
+      padding: 28px;
+      text-align: center;
+    }
 
-            <p class="note">
-              ⏳ This OTP is valid for <b>10 minutes</b>.  
-              Please do not share this code with anyone.
-            </p>
-          </div>
+    .brand {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
 
-          <div class="footer">
-            © ${new Date().getFullYear()} <span class="brand">StackNexa</span>.  
-            All rights reserved.
-          </div>
-        </div>
-      </body>
-      </html>
+    .brand .stack {
+      color: #3b82f6; /* Blue */
+    }
+
+    .brand .nexa {
+      color: #ffffff; /* White */
+    }
+
+    /* Content */
+    .content {
+      padding: 32px;
+      color: #0f172a;
+    }
+
+    .content h2 {
+      margin-top: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .content p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #334155;
+    }
+
+    /* OTP */
+    .otp-box {
+      margin: 30px 0;
+      text-align: center;
+    }
+
+    .otp {
+      display: inline-block;
+      background-color: #eff6ff;
+      color: #1e3a8a;
+      padding: 16px 34px;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      border-radius: 10px;
+      border: 1px dashed #3b82f6;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #475569;
+      margin-top: 20px;
+    }
+
+    /* Footer */
+    .footer {
+      background-color: #f8fafc;
+      padding: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .footer span {
+      color: #2563eb;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="brand">
+        <span class="stack">Stack</span><span class="nexa">Nexa</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <h2>Hello ${name || "User"},</h2>
+
+      <p>
+        We received a request to verify your email address.
+        Please use the OTP below to continue.
+      </p>
+
+      <div class="otp-box">
+        <div class="otp">${otp}</div>
+      </div>
+
+      <p class="note">
+        ⏳ This OTP is valid for <b>10 minutes</b>.  
+        Please do not share this code with anyone.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      © ${new Date().getFullYear()} <span>StackNexa</span>. All rights reserved.
+    </div>
+
+  </div>
+</body>
+</html>
       `,
     });
 
