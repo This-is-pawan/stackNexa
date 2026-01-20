@@ -70,9 +70,10 @@ export const projects = [
 export const sidebarfooter = [
   { id: 1, text: "Setting", icon: TbSettings ,route:'setting', style: "w-[200px] flex items-center gap-3 text-sm capitalize px-4 py-2 rounded-md  hover:text-white transition-all duration-300",},
   { id: 2, text: "Help", icon: MdLiveHelp ,route:'help', style: "w-[200px] flex items-center gap-3 text-sm capitalize px-4 py-2 hover:text-white   transition-all duration-300",},
-  { id: 3, text: "PrivacyPolicy" ,route:'privacy-policy', style: "w-[200px] flex items-center gap-3 text-sm capitalize px-4 py-2 hover:text-white   transition-all duration-300",},
-  { id: 4, text: "Terms & Conditions" ,route:'term-condition', style: "w-[200px] flex items-center gap-3 text-sm capitalize px-4 py-2 hover:text-white   transition-all duration-300",},
-  { id: 5, text: "Billing", icon: GiPayMoney ,route:'billing', style: "w-[200px] flex items-center gap-3 text-sm capitalize px-4 py-2 hover:text-white   transition-all duration-300",},
+  { id: 3, text: "Billing", icon: GiPayMoney ,route:'billing', style: "w-[200px] flex items-center gap-3 text-sm capitalize px-4 py-2 hover:text-white   transition-all duration-300",},
+  { id: 4, text: "PrivacyPolicy" ,route:'privacy-policy', style: "w-[200px] flex items-center gap-3 text-sm capitalize px-4 py-2 hover:text-white   transition-all duration-300",},
+  { id: 5, text: "Terms & Conditions" ,route:'term-condition', style: "w-[200px] flex items-center gap-3 text-sm capitalize px-4 py-2 hover:text-white   transition-all duration-300",},
+  
 ];
 export const sidebarSmall = [
   { id: 1, text: "Setting", icon: TbSettings ,route:'setting',title:'Setting'},

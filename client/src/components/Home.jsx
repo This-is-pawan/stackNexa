@@ -61,7 +61,7 @@ const Home = () => {
           </Link>
 
           <Link
-            to={isLoggedIn ? "/dashboard" : "/register"}
+            to={isLoggedIn ? "/more-about" : "/register"}
             className={`w-[260px] text-center py-3 rounded-full border font-semibold
             transition-all duration-300 hover:scale-105
             ${

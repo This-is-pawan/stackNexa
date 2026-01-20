@@ -51,7 +51,7 @@ const Dashboard = () => {
     >
       {/* ================= GRID ================= */}
       <div
-        className="h-full pt-[4rem] grid transition-all duration-300 w-full"
+        className="h-full  grid transition-all duration-300 w-full"
         style={{
           gridTemplateColumns: isDesktop
             ? sideBar
@@ -70,7 +70,7 @@ const Dashboard = () => {
             {/* TOGGLE ICON */}
             <button
               onClick={() => setSideBar(!sideBar)}
-              className="absolute top-0 right-1 z-50 p-1"
+              className="absolute top-0 right-1 z-0 p-1 "
             >
               {sideBar ? (
                 <GoSidebarCollapse className="text-white" />

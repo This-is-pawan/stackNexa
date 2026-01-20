@@ -49,7 +49,7 @@ localStorage.setItem("otpExpireTime", res.data.user.otpExpire);
   };
 const handleVerified=()=>{
  toast.error("Verify OTP after registration to login");
-
+ 
 }
   return (
     <div

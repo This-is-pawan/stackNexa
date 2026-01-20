@@ -171,3 +171,46 @@ export const MERNSTACK = [
   },
   
 ];
+// src/data.js
+export const stackNexaServices = [
+  {
+    title: "Full-Stack Projects from Scratch",
+    description:
+      "Learn by building real applications from HTML → MERN Stack including authentication, CRUD, APIs, and more.",
+  },
+  {
+    title: "Complete Source Code & Step-by-Step Guide",
+    description:
+      "Each project comes with organized source code and clear explanations for every feature.",
+  },
+  {
+    title: "Beginner-Friendly & Progressive Learning",
+    description:
+      "Start with basic projects and gradually move to advanced ones. Perfect for beginners and aspiring developers.",
+  },
+  {
+    title: "Free & Pro Projects",
+    description:
+      "Access free projects to get started, and unlock pro projects for advanced real-world scenarios.",
+  },
+  {
+    title: "Future Growth Opportunities",
+    description:
+      "Soon launching internships and job support to help you gain real-world experience and kickstart your career.",
+  },
+  {
+    title: "Projects for All Levels",
+    description:
+      "From HTML basics to advanced MERN stack applications, we provide projects suitable for beginners, intermediates, and advanced learners.",
+  },
+  {
+    title: "Career-Focused Learning",
+    description:
+      "Build a portfolio of real-world projects to show to employers and accelerate your career in full-stack development.",
+  },
+  {
+    title: "Step-by-Step Learning Material",
+    description:
+      "Each project comes with detailed guidance, screenshots, and explanations so you can follow along easily.",
+  },
+];

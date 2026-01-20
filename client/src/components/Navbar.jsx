@@ -115,7 +115,7 @@ const Navbar = () => {
           <div className="relative">
             <div
               onClick={() => setOpen(!open)}
-              className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold cursor-pointer"
+              className="w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center font-bold cursor-pointer capitalize "
             >
               {currentUser?.name?.charAt(0)}
             </div>
@@ -140,6 +140,9 @@ const Navbar = () => {
                   </li>
                   <li className="px-3 py-2 hover:bg-pink-300">
                     <Link to="/dashboard/setting">Settings</Link>
+                  </li>
+                  <li className="px-3 py-2 hover:bg-pink-300">
+                    <Link to="/">Home</Link>
                   </li>
                   <li className="px-3 py-2">
                     <button

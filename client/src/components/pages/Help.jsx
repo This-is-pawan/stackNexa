@@ -95,14 +95,14 @@ const Help = () => {
           </Link>
 
           <Link
-            to="/dashboard/privacy"
+            to="/dashboard/privacy-policy"
             className="px-4 py-2 rounded-lg bg-gray-700 text-white"
           >
             Privacy Policy
           </Link>
 
           <Link
-            to="/dashboard/TermCondition"
+            to="/dashboard/term-condition"
             className="px-4 py-2 rounded-lg bg-gray-700 text-white"
           >
             Terms & Conditions

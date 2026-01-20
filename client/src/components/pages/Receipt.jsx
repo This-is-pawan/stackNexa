@@ -20,7 +20,7 @@ const ReceiptPage = () => {
 
   return (
     <div
-      className={`min-h-screen flex justify-center items-start p-4 mt-[4rem]
+      className={`min-h-screen flex justify-center items-start p-4 
         ${
           theme === "dark"
             ? "bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 text-white"
@@ -31,7 +31,7 @@ const ReceiptPage = () => {
         {/* Header */}
         <div className="flex justify-between items-center border-b border-gray-300 dark:border-gray-700 pb-4">
           <span className="text-2xl md:text-3xl font-bold text-blue-600">
-            Stacknexa
+            Stack<span className="text-white">Nexa</span>
           </span>
           <span className="text-lg md:text-xl font-semibold text-green-600">
             Razorpay

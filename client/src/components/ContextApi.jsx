@@ -71,7 +71,10 @@ const ContextApi = ({ children }) => {
       localStorage.setItem("otpExpireTime", otpExpire_time);
     }
   }, [otpExpire_time]);
-const [verified,setVeified]=useState(false)
+const [verified, setVeified] = useState(() => {
+  return localStorage.getItem("verified") === "true";
+});
+
   const Handle_verified = async (otp) => {
     try {
       setLoading(true);
@@ -82,6 +85,7 @@ const [verified,setVeified]=useState(false)
 
       if (data?.success) {
         toast.success("OTP verified successfully, please login");
+        localStorage.setItem("verified", "true"); 
         localStorage.removeItem("otpExpireTime");
         setOtpExpire_time(null);
         setVeified(true)
