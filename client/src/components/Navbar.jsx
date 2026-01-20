@@ -10,7 +10,7 @@ import { TbLogout2 } from "react-icons/tb";
 import { IoNotificationsCircleSharp } from "react-icons/io5";
 import { useAppContext } from "./ContextApi";
 import NavLinks from "./pages/NavLinks";
-
+import profileImage from '../assets/cloud.svg'
 const Navbar = () => {
   const {
     theme,
@@ -122,7 +122,10 @@ const Navbar = () => {
 
             {open && (
               <div className="absolute right-0 top-10 w-48 bg-pink-100 rounded-lg shadow-lg">
-                <div className="p-3 border-b text-center">
+                <div className="p-3 border-b text-center ">
+                  <div className="flex justify-center">
+                  <img src={profileImage} className="w-9 h-9 rounded-full border border-black text-center p-1" alt="profile_image" />
+                    </div>
                   <p className="font-semibold text-black capitalize">
                     {currentUser?.name}
                   </p>
@@ -165,7 +168,7 @@ const Navbar = () => {
         ) : (
           <Link
             to="/register"
-            className="px-4 py-2 rounded-full font-semibold bg-gradient-to-r from-blue-300 to-yellow-200 text-black"
+            className="px-4 py-2 rounded-full font-semibold bg-gradient-to-r from-blue-300 to-yellow-200 text-black  text-sm "
           >
             SignUp / Login
           </Link>

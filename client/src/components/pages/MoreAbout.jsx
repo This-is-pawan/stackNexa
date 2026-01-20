@@ -43,7 +43,7 @@ const isLoggedIn = auth?.isAuthenticated || Boolean(Googleuser?.isAuthenticated)
         {/* Call-to-Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10">
           <a
-            href={isLoggedIn ? "/billing" : "/register"}
+            href={isLoggedIn ? "/dashboard/billing" : "/register"}
             className="w-[260px] text-center bg-blue-600 hover:bg-blue-700 text-white 
             font-semibold py-3 rounded-full shadow-xl transition-all duration-300 
             hover:scale-105"
