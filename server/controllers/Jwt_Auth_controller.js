@@ -3,8 +3,9 @@ const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
 const cookie = require("cookie-parser");
-const sendOtpMail = require("../utils/mail");
+
 const { GoogleUser } = require("../models/Google_model");
+const sendOtpMail = require("../utils/mail");
 
 
 dotenv.config();
@@ -40,7 +41,7 @@ const Register = async (req, res) => {
     });
 
    
-    await sendOtpMail(user.email, user.name || "User", user.otp)
+    sendOtpMail(user.email, user.name || "User", user.otp)
       .catch(err => console.error("OTP MAIL ERROR:", err));
 
     return res.status(201).json({

@@ -8,7 +8,7 @@ import { LuSunMoon } from "react-icons/lu";
 import { TiWeatherSunny } from "react-icons/ti";
 import { FaBarsStaggered } from "react-icons/fa6";
 import { TbLogout2 } from "react-icons/tb";
-
+import { IoNotificationsCircleSharp } from "react-icons/io5";
 // Context
 import { useAppContext } from "./ContextApi";
 
@@ -26,7 +26,11 @@ const Navbar = () => {
     open,
     setOpen,
     Googleuser,
+    verified,
+    setVeified,
+    setGoogleUser
   } = useAppContext();
+console.log(auth);
 
   const navigate = useNavigate();
   const isLoggedIn = auth?.isAuthenticated ||Googleuser?.user;
@@ -39,7 +43,6 @@ const Navbar = () => {
     try {
       await axios.post(
         `${import.meta.env.VITE_API_URL}/api/project/logout`,
-        {},
         { withCredentials: true }
       );
 
@@ -48,12 +51,12 @@ const Navbar = () => {
         isAuthenticated: false,
         loading: false,
       });
-
+ setVeified(true)
       toast.success("Logged out successfully");
       navigate("/");
     } catch (error) {
       toast.error("Logout failed");
-      console.error("Logout error:", error);
+  
     }
   };
 
@@ -93,10 +96,18 @@ const Navbar = () => {
 
       {/* Nav Links */}
       <NavLinks />
-
+    
       {/* Right Section */}
-      <div className="flex items-center gap-4 relative">
+      
+      <div className="transition-all duration-500  flex items-center gap-8 relative ">
         {/* Theme Toggle */}
+
+         <div className="relative ">
+          <p className={` absolute bottom-[0.7rem] left-[0.5rem] w-3.5 h-3.5 text-center leading-4 text-[0.6rem] rounded-full ${theme === "dark" ? " text-black bg-pink-200":"bg-pink-300 text-pink-900"}`}>0</p>
+         <IoNotificationsCircleSharp className={`text-xl ${
+        theme === "dark" ? " text-black" : " text-white"
+      }`} />
+        </div>
         <div onClick={handleDarkMode} className="cursor-pointer">
           {theme === "dark" ? (
             <LuSunMoon className="text-black text-lg" />
@@ -104,8 +115,9 @@ const Navbar = () => {
             <TiWeatherSunny className="text-yellow-300 text-lg" />
           )}
         </div>
+        
 
-        {/* Auth Section */}
+        
         {isLoggedIn ? (
           <div className="relative">
             {/* Avatar */}
@@ -115,7 +127,6 @@ const Navbar = () => {
             >
               {currentUser?.name?.charAt(0)}
             </div>
-
             {/* Dropdown */}
             {open && (
               <div className="absolute right-0 top-10 w-48 bg-pink-100 rounded-lg shadow-lg">
@@ -154,7 +165,7 @@ const Navbar = () => {
               </div>
             )}
           </div>
-        ) : (
+        ) :  (
           <Link
             to="/register"
             className={`rounded-full px-4 py-2 font-semibold transition-all hover:scale-105 max-[900px]:text-[0.6rem]

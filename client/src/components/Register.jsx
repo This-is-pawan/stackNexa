@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { theme, setOtpExpire_time,setBar } = useAppContext();
+  const { theme, setOtpExpire_time,setBar,verified } = useAppContext();
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -47,7 +47,10 @@ localStorage.setItem("otpExpireTime", res.data.user.otpExpire);
     e.preventDefault();
     window.open(`${import.meta.env.VITE_API_URL}/login-with-google`,"_self");
   };
+const handleVerified=()=>{
+ toast.error("Verify OTP after registration to login");
 
+}
   return (
     <div
       className={`min-h-screen w-full flex items-center justify-center px-4
@@ -114,9 +117,11 @@ localStorage.setItem("otpExpireTime", res.data.user.otpExpire);
 
         <p className="text-center text-sm">
           Already have an account?{" "}
-          <Link to="/login" className="text-orange-500 underline font-semibold">
+     {verified ? <Link to="/login" className="text-orange-500 underline font-semibold">
             Login
-          </Link>
+          </Link> :<Link to="/register" className="text-orange-500 underline font-semibold" onClick={()=>{handleVerified()}}>
+            Login
+          </Link>}
         </p>
         <p className="text-center">OR</p>
         {/* GOOGLE */}

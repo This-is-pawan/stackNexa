@@ -2,25 +2,35 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 /**
- * ✅ SINGLE TRANSPORTER
- * Works on:
- * - localhost
- * - Render / production
+ * ✅ Gmail Transporter (Production Safe)
  */
 const transporter = nodemailer.createTransport({
-  host: process.env.BREVO_SMTP_HOST,
-  port: Number(process.env.BREVO_SMTP_PORT),
-  secure: false, // Brevo uses TLS on 587
+  service: "gmail",
   auth: {
-    user: process.env.BREVO_SMTP_USER,
-    pass: process.env.BREVO_SMTP_PASS,
+    user: process.env.GOOGLE_USER,
+    pass: process.env.GOOGLE_PASS,
   },
+});
+
+/**
+ * 🔎 Verify transporter once
+ */
+transporter.verify((err) => {
+  if (err) {
+    console.error("❌ Gmail SMTP verification failed:", err.message);
+  } else {
+    console.log("✅ Gmail SMTP ready");
+  }
 });
 
 /**
  * 📩 Send OTP Email
  */
 const sendOtpMail = async (email, name, otp, otpExpiry) => {
+  if (!process.env.GOOGLE_USER || !process.env.GOOGLE_PASS) {
+    throw new Error("Gmail credentials missing in environment variables");
+  }
+
   const requestTime = new Date().toLocaleString("en-IN", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -33,67 +43,81 @@ const sendOtpMail = async (email, name, otp, otpExpiry) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+      from: process.env.EMAIL_FROM || `"StackNexa" <${process.env.GOOGLE_USER}>`,
       to: email,
-      subject: "🔐 StackNexa  Verification OTP",
+      subject: "🔐 StackNexa OTP Verification",
       html: `
-      <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:30px;">
-        <div style="max-width:520px; margin:auto; background:#ffffff; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.08); overflow:hidden;">
-          
-          <!-- Header -->
-          <div style="background:linear-gradient(135deg,#6366f1,#4f46e5); padding:24px; text-align:center;">
-            <h1 style="margin:0; letter-spacing:2px; font-size:32px;">
-              <span style="color:#facc15;">Stack</span><span style="color:#ffffff;">Nexa</span>
-            </h1>
-            <p style="margin:6px 0 0; color:#e0e7ff; font-size:14px;">
-              Secure Authentication Service
-            </p>
-          </div>
+     <div style="max-width:560px;margin:40px auto;background:#ffffff;border-radius:16px;overflow:hidden;
+box-shadow:0 18px 40px rgba(15,23,42,0.25);font-family:Inter,Arial,sans-serif;">
 
-          <!-- Body -->
-          <div style="padding:24px; color:#111827;">
-            <p style="font-size:16px;">Hello <strong>${name}</strong>,</p>
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#0f172a,#1e3a8a);padding:28px;text-align:center;">
+    <h1 style="margin:0;font-size:32px;letter-spacing:1px;color:#ffffff;">
+      Stack<span style="color:#60a5fa;">Nexa</span>
+    </h1>
+    <p style="margin-top:6px;font-size:13px;color:#dbeafe;">
+      Secure Account Verification
+    </p>
+  </div>
 
-            <p style="font-size:14px; color:#374151;">
-              Use the OTP below to securely log in to your StackNexa account.
-            </p>
+  <!-- Body -->
+  <div style="padding:30px;color:#0f172a;">
+    <p style="font-size:16px;margin-bottom:8px;">
+      Hello <strong>${name}</strong>,
+    </p>
 
-            <div style="margin:24px 0; text-align:center;">
-              <div style="display:inline-block; padding:14px 28px; font-size:28px; letter-spacing:6px; font-weight:bold; background:#f1f5f9; border-radius:10px; color:#4f46e5;">
-                ${otp}
-              </div>
-            </div>
+    <p style="font-size:14px;color:#334155;line-height:1.6;">
+      Use the One-Time Password (OTP) below to verify your StackNexa account.
+    </p>
 
-            <p style="font-size:14px; color:#374151;">
-              ⏳ <strong>Valid for:</strong> 10 minutes <br/>
-              ⌛ <strong>Expires at:</strong> ${expiryTime}
-            </p>
-
-            <p style="font-size:13px; color:#6b7280; margin-top:20px;">
-              📅 Requested on: ${requestTime}
-            </p>
-
-            <hr style="border:none; border-top:1px solid #e5e7eb; margin:24px 0;" />
-
-            <p style="font-size:13px; color:#6b7280;">
-              If you didn’t request this OTP, please ignore this email or contact StackNexa support.
-            </p>
-          </div>
-
-          <!-- Footer -->
-          <div style="background:#f9fafb; padding:16px; text-align:center; font-size:12px; color:#9ca3af;">
-            © ${new Date().getFullYear()} StackNexa. All rights reserved.
-          </div>
-
-        </div>
+    <!-- OTP Box -->
+    <div style="margin:30px 0;text-align:center;">
+      <div style="
+        display:inline-block;
+        padding:16px 42px;
+        font-size:32px;
+        font-weight:700;
+        letter-spacing:8px;
+        background:#f8fafc;
+        border:2px solid #1e3a8a;
+        border-radius:14px;
+        color:#0f172a;
+      ">
+        ${otp}
       </div>
+    </div>
+
+    <div style="font-size:14px;color:#334155;line-height:1.6;">
+      ⏳ <strong>Valid for:</strong> 10 minutes<br/>
+      ⌛ <strong>Expires at:</strong> ${expiryTime}
+    </div>
+
+    <p style="font-size:12px;color:#64748b;margin-top:22px;">
+      Requested on ${requestTime}
+    </p>
+
+    <hr style="border:none;border-top:1px solid #e5e7eb;margin:26px 0;" />
+
+    <p style="font-size:12px;color:#64748b;">
+      If you didn’t request this OTP, you can safely ignore this email.
+    </p>
+  </div>
+
+  <!-- Footer -->
+  <div style="background:#f1f5f9;padding:16px;text-align:center;
+  font-size:11px;color:#64748b;">
+    © ${new Date().getFullYear()} StackNexa · All rights reserved
+  </div>
+
+</div>
+
       `,
     });
 
-    console.log("✅ OTP email sent to:", email);
+    console.log("✅ OTP email sent (Premium Dark UI):", email);
   } catch (error) {
-    console.error("❌ Email send failed:", error);
-    throw new Error("Failed to send OTP email");
+    console.error("❌ OTP email failed:", error.message);
+    throw new Error("OTP email delivery failed");
   }
 };
 

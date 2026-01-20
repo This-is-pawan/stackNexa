@@ -34,7 +34,7 @@ import RazorpayPayment from "./components/pages/RazorpayPayment";
 import ReceiptPage from "./components/pages/Receipt";
 
 const App = () => {
-  const { theme, auth ,Googleuser} = useAppContext();
+  const { theme, auth ,Googleuser,verified} = useAppContext();
   const currentLoading=auth?.loading||Boolean(Googleuser?.loading)
 
   if (currentLoading) return <GlobalLoading />;
@@ -58,7 +58,7 @@ const currentUser=auth?.isAuthenticated || Boolean(Googleuser?.isAuthenticated)
 
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={verified? <Login />:<Register />} />
         <Route path="/user-verified" element={<UserVerified />} />
         <Route path="/razorpaypayment" element={<RazorpayPayment />} />
         <Route path="/receipt" element={<ReceiptPage />} />
