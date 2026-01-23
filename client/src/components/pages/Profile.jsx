@@ -28,13 +28,78 @@ const Profile = () => {
 
   const isProfileExists = profiles.length > 0;
   const profile_id = profiles?.[0]?._id;
+// compress file 
+
+const compressImage = (file, maxSizeMB = 3) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onload = () => (img.src = reader.result);
+    reader.onerror = reject;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // resize (important for mobile)
+      const MAX_WIDTH = 1200;
+      const scale = MAX_WIDTH / img.width;
+
+      canvas.width = MAX_WIDTH;
+      canvas.height = img.height * scale;
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      let quality = 0.9;
+
+      const compress = () => {
+        canvas.toBlob(
+          (blob) => {
+            if (blob.size / 1024 / 1024 <= maxSizeMB || quality <= 0.4) {
+              resolve(new File([blob], file.name, { type: "image/jpeg" }));
+            } else {
+              quality -= 0.1;
+              compress();
+            }
+          },
+          "image/jpeg",
+          quality
+        );
+      };
+
+      compress();
+    };
+  });
+};
+
+
+
 
   // ---------------- FILE CHANGE ----------------
-  const handleFileChange = (e) => {
-    const selected = e.target.files[0];
-    if (!selected) return;
-    setFile(selected);
-  };
+
+ const handleFileChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    return toast.error("Only images allowed");
+  }
+
+  try {
+    const compressedFile = await compressImage(file, 3);
+    setFile(compressedFile);
+
+    toast.success(
+      `Image optimized to ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`
+    );
+  } catch (err) {
+    toast.error("Image processing failed");
+  }
+};
+
+
 
   // ---------------- UPLOAD ----------------
   const handleUpload = async (e) => {
@@ -133,7 +198,7 @@ const Profile = () => {
           <img
             src={profile_image}
             alt="profile"
-            className="w-20 h-20 rounded-full border hover:scale-150 transition cursor-pointer"
+            className="w-20 h-20 rounded-full border hover:scale-150 transition cursor-pointer object-cover"
           />
 
           <div>

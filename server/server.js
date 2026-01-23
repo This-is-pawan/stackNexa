@@ -40,7 +40,9 @@ const storage=new CloudinaryStorage({
     public_id:()=>`profile_${Date.now()}`,
   }
 });
-const upload=multer({storage})
+const upload=multer({storage, limits: {
+    fileSize: 3 * 1024 * 1024, // 5MB
+  },})
 app.post("/upload-profile",upload.single("profile"),async (req,res) => {
   try {
     if(!req.file){
