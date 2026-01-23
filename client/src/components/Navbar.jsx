@@ -7,6 +7,7 @@ import { LuSunMoon } from "react-icons/lu";
 import { TiWeatherSunny } from "react-icons/ti";
 import { FaBarsStaggered } from "react-icons/fa6";
 import stackNexaLogo from "../assets/stackNexaLogo.png"; 
+import deafault_user_image from '../assets/default_user_image.svg'
 import { TbLogout2 } from "react-icons/tb";
 import { IoNotificationsCircleSharp } from "react-icons/io5";
 import { useAppContext } from "./ContextApi";
@@ -24,7 +25,8 @@ const Navbar = () => {
     setOpen,
     Googleuser,
     setGoogleUser,
-    setVeified
+    setVeified,
+    profiles
   } = useAppContext();
 
   const navigate = useNavigate();
@@ -32,6 +34,11 @@ const Navbar = () => {
 
   const isLoggedIn = auth?.isAuthenticated || Googleuser?.isAuthenticated;
   const currentUser = auth?.user || Googleuser?.user;
+ const profile_image =
+  profiles && profiles.length > 0
+    ? profiles[0]?.image?.url
+    : deafault_user_image;
+
 
   /* ================= LOGOUT ================= */
   const logout = async () => {
@@ -127,7 +134,15 @@ const Navbar = () => {
               <div className="absolute right-0 top-10 w-48 bg-pink-100 rounded-lg shadow-lg z-50">
                 <div className="p-3 border-b text-center ">
                   <div className="flex justify-center">
-                  <img src={profileImage} className="w-9 h-9 rounded-full border border-black text-center p-1" alt="profile_image" />
+              <img
+  src={profile_image }
+  alt="profile_image"
+  className="w-10 h-10 rounded-full border border-black 
+             transition-transform duration-300 
+             hover:scale-150 cursor-pointer"
+/>
+
+                  
                     </div>
                   <p className="font-semibold text-black capitalize">
                     {currentUser?.name}

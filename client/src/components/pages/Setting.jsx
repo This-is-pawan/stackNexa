@@ -18,7 +18,7 @@ const Setting = () => {
         }`}
       onClick={() => {
         setBar(false);
-        // setOpen(false); // optional
+        setOpen(false); 
       }}
     >
       {/* CONTENT WRAPPER (IMPORTANT) */}

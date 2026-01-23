@@ -178,7 +178,22 @@ const [verified, setVeified] = useState(() => {
     getGoogleUser();
     googleAllUser();
   }, []);
+// profile
+   const [profiles, setProfiles] = useState([]);
+const fetchProfiles = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/profiles`);
+      setProfiles(res?.data?.data);
+    } catch (err) {
+      console.error("Fetch error", err);
+    }
+  };
 
+
+
+  useEffect(() => {
+    fetchProfiles();
+  }, []);
   return (
     <AppContext.Provider
       value={{
@@ -199,7 +214,10 @@ const [verified, setVeified] = useState(() => {
         Googleuser,
         setGoogleUser,
         verified,
-        setVeified
+        setVeified,
+        profiles, 
+        setProfiles,
+        fetchProfiles
       }}
     >
       {children}
