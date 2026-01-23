@@ -13,7 +13,15 @@
   background-color: #272424;
   color: #fff;
 }
-/* ===== Custom Scrollbar ===== */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-y: scroll;    
+  scrollbar-width: none;  
+}
+
+
 
 /* Chrome, Edge, Safari */
 ::-webkit-scrollbar {
@@ -36,9 +44,9 @@
 }
 
 
-* {
+/* * {
   scrollbar-width: thin;
   scrollbar-color: #22c55e transparent;
-}
+} */
 
 

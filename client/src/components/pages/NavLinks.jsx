@@ -4,6 +4,7 @@ import { MdWorkspacePremium ,MdLiveHelp} from "react-icons/md";
 import { GiPayMoney } from "react-icons/gi";
 import {  TbSettings } from "react-icons/tb";
 import { data, projects as pro, sidebarfooter } from "../data";
+import stackNexaLogo from "../../assets/stackNexaLogo.png"; 
 import { Link } from "react-router-dom";
 const NavLinks = () => {
   const { bar, theme, auth ,Googleuser} = useAppContext();
@@ -18,7 +19,7 @@ const isLoggedIn = auth?.isAuthenticated || Boolean(Googleuser?.isAuthenticated)
     w-[18rem]
     h-[calc(100vh-4rem)]
     overflow-y-auto
-    
+
         transition-transform duration-200 ease-in-out
         ${
           bar
@@ -32,17 +33,12 @@ const isLoggedIn = auth?.isAuthenticated || Boolean(Googleuser?.isAuthenticated)
         }
       `}
     >
-      <div className="flex items-center justify-center p-2">
-  <p
-    className="max-[500px]:text-3xl md:text-4xl font-extrabold tracking-wide
-           bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500
-           bg-clip-text text-transparent
-           drop-shadow-[0_0_12px_rgba(168,85,247,0.45)]
-           select-none">
-    Stack<span className="text-white">Nexa</span>
-  </p>
-</div>
-      <h2 className="w-[4rem] h-[1.5rem] m-auto text-sm text-center mt-4 pb-2  border-blue-400/40 text-green-300 border-none rounded-lg bg-blue-600/30 ">
+ 
+             <img src={stackNexaLogo}
+                          alt="StackNexa"
+                          className=" w-full h-16  mx-auto object-cover "
+                        />
+      <h2 className="w-[4rem] h-[1.5rem] m-auto text-sm text-center  pb-2  border-blue-400/40 text-green-300 border-none rounded-lg bg-blue-600/30 ">
         <Link to="/">Home</Link>
       </h2>
       <h2 className="text-sm text-center mt-4 pb-2 border-b border-green-400/40 text-green-300">

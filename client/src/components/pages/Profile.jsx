@@ -68,7 +68,7 @@ const Profile = () => {
     <input
       type="file"
       accept="image/png, image/jpeg, "
-      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer "
       onChange={(e) => setPhoto(e.target.files[0])}
     />
 

@@ -21,29 +21,31 @@ const Billing = () => {
     },
     {
       name: "Pro",
-      price: 499,
-      displayPrice: "₹499 / month",
+      price: 199,
+      displayPrice: "₹199 / month",
       tag: "Most Popular 🚀",
       features: [
         "All Free features",
         "Advanced real-world projects",
         "Source code access",
         "Priority support",
-        "Certificates",
+        "intership opertunity"
       ],
       highlight: true,
     },
     {
       name: "Premium",
-      price: 999,
-      displayPrice: "₹999 / month",
+      price: 499,
+      displayPrice: "₹499 / month",
       tag: "For Professionals 💎",
       features: [
         "All Pro features",
         "1-on-1 mentorship",
         "Project reviews",
         "Early access to new content",
-        "Lifetime certificates",
+        "intership opportunity(performance-based)",
+        "project completion certificate"
+      
       ],
     },
   ];

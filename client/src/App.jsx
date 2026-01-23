@@ -36,7 +36,7 @@ import RazorpayPayment from "./components/pages/RazorpayPayment";
 import ReceiptPage from "./components/pages/Receipt";
 import MoreAbout from "./components/pages/MoreAbout";
 import Offers from "./components/pages/Offers";
-
+import Certificate from "./components/pages/Certificate"
 const App = () => {
   const { theme, auth, Googleuser, verified } = useAppContext();
 
@@ -93,6 +93,7 @@ const App = () => {
             </Route>
 
             <Route path="help" element={<Help />} />
+            <Route path="certificate" element={<Certificate />} />
             <Route path="privacy-policy" element={<Privacy />} />
             <Route path="term-condition" element={<TermCondition />} />
             <Route path="billing" element={<Billing />} />

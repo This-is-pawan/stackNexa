@@ -35,7 +35,7 @@ const Home = () => {
               theme === "dark" ? "text-yellow-500" : "text-blue-600"
             }`}
           >
-            My MERN Services
+             StackNexa
           </span>
         </h1>
 

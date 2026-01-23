@@ -17,7 +17,7 @@ import {
   sidebarSmall,
 } from "../components/data";
 
-const SIDEBAR_OPEN = "250px";
+const SIDEBAR_OPEN = "300px";
 const SIDEBAR_CLOSE = "29px";
 
 const Dashboard = () => {
@@ -125,8 +125,8 @@ const Dashboard = () => {
                       ))}
                     </ul>
 
-                    <h2 className="flex justify-center items-center gap-2 mt-6 border-b border-blue-400/40 pb-2">
-                      Pro <MdWorkspacePremium />
+                    <h2 className="flex justify-center items-center gap-2 mt-6 border-b border-blue-400/40 pb-2 text-blue-400">
+                      Pro <MdWorkspacePremium className="text-blue-400  animate-pulse" />
                     </h2>
 
                     <ul className="mt-3 space-y-2">

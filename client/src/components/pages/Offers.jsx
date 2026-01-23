@@ -12,20 +12,20 @@ const Offers = () => {
 
   return (
     <div
-      className={`w-full justify-center fixed top-[4rem] left-0 right-0 z-[60] px-4 py-2 animate-pulse
+      className={`w-full justify-center fixed top-[4rem] left-0 right-0  px-4 p-1 animate-pulse z-20
       ${
         theme === "dark"
           ? "bg-gradient-to-r from-pink-600 to-purple-700 text-white"
           : "bg-gradient-to-r from-yellow-400 to-orange-500 text-black"
       }`}
     >
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center  sm:text-left ">
         
         {/* Offer Text */}
-        <p className="text-sm sm:text-base font-semibold">
+        <p className=" text-sm sm:text-base font-semibold">
           🚀 <span className="font-bold">Launch Offer – StackNexa</span> |
           Free Projects + Premium Plans at{" "}
-          <span className="underline font-bold">₹499 / ₹999</span>
+          <span className="underline font-bold">₹199 / ₹499</span>
         </p>
 
         {/* Actions */}

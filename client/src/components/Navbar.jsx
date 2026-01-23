@@ -6,6 +6,7 @@ import { LiaSpinnerSolid } from "react-icons/lia";
 import { LuSunMoon } from "react-icons/lu";
 import { TiWeatherSunny } from "react-icons/ti";
 import { FaBarsStaggered } from "react-icons/fa6";
+import stackNexaLogo from "../assets/stackNexaLogo.png"; 
 import { TbLogout2 } from "react-icons/tb";
 import { IoNotificationsCircleSharp } from "react-icons/io5";
 import { useAppContext } from "./ContextApi";
@@ -76,9 +77,11 @@ const Navbar = () => {
     >
       {/* Logo */}
       <div className="hidden min-[900px]:block">
-        <p className="text-3xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-          Stack<span className="text-white">Nexa</span>
-        </p>
+        <img
+                     src={stackNexaLogo}
+                     alt="StackNexa"
+                     className="mx-auto w-36 sm:w-48 object-cover "
+                   />
       </div>
 
       {/* Mobile Menu */}
@@ -121,7 +124,7 @@ const Navbar = () => {
             </div>
 
             {open && (
-              <div className="absolute right-0 top-10 w-48 bg-pink-100 rounded-lg shadow-lg">
+              <div className="absolute right-0 top-10 w-48 bg-pink-100 rounded-lg shadow-lg z-50">
                 <div className="p-3 border-b text-center ">
                   <div className="flex justify-center">
                   <img src={profileImage} className="w-9 h-9 rounded-full border border-black text-center p-1" alt="profile_image" />
