@@ -3,7 +3,7 @@ const routers=express.Router()
 const cloudinary=require('cloudinary').v2
 const {CloudinaryStorage} =require('multer-storage-cloudinary');
 const multer=require('multer');
-const { upload_profile, update_profile, delete_profile, profiles } = require('../controllers/profile');
+const { upload_profile, update_profile, delete_profile, profiles,UserName, UserNameGet } = require('../controllers/profile');
 cloudinary.config({
   cloud_name:process.env.CLOUDINARY_NAME,
  api_key:process.env.CLOUDINARY_API_KEY,
@@ -25,4 +25,6 @@ const upload=multer({storage, limits: {
   routers.put("/update-profile/:id", upload.single("profile"),update_profile)
   routers.delete("/delete-profile/:id",delete_profile)
   routers.get("/profiles",profiles)
+  routers.post("/user-name",UserName)
+  routers.get("/user-name-get",UserNameGet)
   module.exports={routers}

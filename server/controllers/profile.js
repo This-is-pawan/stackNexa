@@ -1,7 +1,8 @@
-const dotenv = require('dotenv');
-const { profileModel } = require('../models/profileModel');
-  // upload
-const cloudinary=require('cloudinary').v2
+const dotenv = require("dotenv");
+const { profileModel, UserNameModel } = require("../models/profileModel");
+
+// upload
+const cloudinary = require("cloudinary").v2;
 const upload_profile = async (req, res) => {
   try {
     if (!req.file) {
@@ -37,15 +38,19 @@ const upload_profile = async (req, res) => {
 };
 
 // update
-const update_profile= async (req, res) => {
+const update_profile = async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded" });
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
     }
 
     const profile = await profileModel.findById(req.params.id);
     if (!profile) {
-      return res.status(404).json({ success: false, message: "Data not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data not found" });
     }
 
     if (profile.image?.public_id) {
@@ -60,7 +65,6 @@ const update_profile= async (req, res) => {
     await profile.save();
 
     res.json({ success: true, message: "Image updated", data: profile });
-
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -71,7 +75,9 @@ const delete_profile = async (req, res) => {
   try {
     const profile = await profileModel.findById(req.params.id);
     if (!profile) {
-      return res.status(404).json({ success: false, message: "Data not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data not found" });
     }
 
     if (profile.image?.public_id) {
@@ -84,7 +90,6 @@ const delete_profile = async (req, res) => {
       success: true,
       message: "Image deleted",
     });
-
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -95,4 +100,44 @@ const profiles = async (req, res) => {
   res.json({ success: true, data });
 };
 
-module.exports={upload_profile,update_profile,delete_profile,profiles}
+const UserName = async (req, res) => {
+  const { name } = req.body;
+  if (!name) {
+    res.json({ success: false, message: "name is required" });
+  }
+  try {
+    const user = await UserNameModel.findOne({ name });
+
+    if (user) {
+      res.json({ success: false, message: "user-name already exist" });
+    }
+    const creating_user = await UserNameModel.create({ name });
+    res.json({
+      success: true,
+      message: "create username successfully",
+      creating_user,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+const UserNameGet=async (req,res) => {
+ 
+  try {
+   const user_name_exist = await UserNameModel.findOne();
+    if (user_name_exist) {
+      res.json({ success: true, message: "get user name successfully",user_name_exist });
+    }
+  } catch (error) {
+    res.json({ success: false, message:error });
+  }
+}
+
+module.exports = {
+  upload_profile,
+  update_profile,
+  delete_profile,
+  profiles,
+  UserName,
+  UserNameGet,
+};

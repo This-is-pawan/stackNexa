@@ -1,16 +1,17 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useAppContext } from "../ContextApi";
 import { TbMoodEdit } from "react-icons/tb";
 import { LiaSpinnerSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
+import { FaCrown ,FaSpinner,FaUserTie} from "react-icons/fa";
+
 import axios from "axios";
 import deafault_user_image from "../../assets/default_user_image.svg";
 import { toast } from "react-toastify";
 
 const Profile = () => {
   const fileInputRef = useRef(null);
-  const { user, theme, profiles, setBar, setOpen, fetchProfiles } =
-    useAppContext();
+  const { user, theme, profiles, setBar, setOpen, fetchProfiles ,user_name,user_name_get,free_loading,} =useAppContext();
 
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
@@ -18,145 +19,118 @@ const Profile = () => {
 
   const [saveLoading, setSaveLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [userNameLoading, setUserNameLoading] = useState(false);
+  const [note, setNote] = useState(true);
+  const [free_user_name, setFree_user_name] = useState(true);
+ 
+  
+  
+  // const [pro_user_name, setPro_user_name] = useState(true);
 
-  // 🔥 delete confirm states
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
-  const profile_image =
+  const profileImage =
     profiles?.length > 0 ? profiles[0]?.image?.url : deafault_user_image;
 
-  const isProfileExists = profiles.length > 0;
-  const profile_id = profiles?.[0]?._id;
-// compress file 
+  const isProfileExists = profiles?.length > 0;
+  const profileId = profiles?.[0]?._id;
 
-const compressImage = (file, maxSizeMB = 3) => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const reader = new FileReader();
+  // ---------------- IMAGE COMPRESS ----------------
+  const compressImage = (file, maxSizeMB = 3) =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
 
-    reader.readAsDataURL(file);
-    reader.onload = () => (img.src = reader.result);
-    reader.onerror = reject;
+      reader.readAsDataURL(file);
+      reader.onload = () => (img.src = reader.result);
+      reader.onerror = reject;
 
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
 
-      // resize (important for mobile)
-      const MAX_WIDTH = 1200;
-      const scale = MAX_WIDTH / img.width;
+        const MAX_WIDTH = 1200;
+        const scale = Math.min(1, MAX_WIDTH / img.width);
 
-      canvas.width = MAX_WIDTH;
-      canvas.height = img.height * scale;
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
 
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      let quality = 0.9;
+        let quality = 0.9;
 
-      const compress = () => {
-        canvas.toBlob(
-          (blob) => {
-            if (blob.size / 1024 / 1024 <= maxSizeMB || quality <= 0.4) {
-              resolve(new File([blob], file.name, { type: "image/jpeg" }));
-            } else {
-              quality -= 0.1;
-              compress();
-            }
-          },
-          "image/jpeg",
-          quality
-        );
+        const compress = () => {
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) return reject();
+              if (blob.size / 1024 / 1024 <= maxSizeMB || quality <= 0.4) {
+                resolve(new File([blob], file.name, { type: "image/jpeg" }));
+              } else {
+                quality -= 0.1;
+                compress();
+              }
+            },
+            "image/jpeg",
+            quality
+          );
+        };
+
+        compress();
       };
-
-      compress();
-    };
-  });
-};
-
+    });
 
   // ---------------- FILE CHANGE ----------------
+  const handleFileChange = async (e) => {
+    const selected = e.target.files[0];
+    if (!selected) return;
 
- const handleFileChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    if (!selected.type.startsWith("image/")) {
+      return toast.error("Only image files allowed");
+    }
 
-  if (!file.type.startsWith("image/")) {
-    return toast.error("Only images allowed");
-  }
+    try {
+      const compressed = await compressImage(selected, 3);
+      setFile(compressed);
+      toast.success(
+        `Optimized to ${(compressed.size / 1024 / 1024).toFixed(2)} MB`
+      );
+    } catch {
+      toast.error("Image processing failed");
+    }
+  };
 
-  try {
-    const compressedFile = await compressImage(file, 3);
-    setFile(compressedFile);
-
-    toast.success(
-      `Image optimized to ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`
-    );
-  } catch (err) {
-    toast.error("Image processing failed");
-  }
-};
-
-
-
-  // ---------------- UPLOAD ----------------
-  const handleUpload = async (e) => {
+  // ---------------- UPLOAD / UPDATE ----------------
+  const submitProfile = async (e) => {
     e.preventDefault();
-    if (!file) return toast.error("Select an image");
+    if (!file) return toast.error("Please select an image");
 
     const formData = new FormData();
     formData.append("profile", file);
 
     try {
       setSaveLoading(true);
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/profile/upload-profile`,
-        formData,
-        { withCredentials: true }
-      );
-      toast.success("Profile saved successfully");
+      const url = isProfileExists
+        ? `/profile/update-profile/${profileId}`
+        : "/profile/upload-profile";
+
+      const method = isProfileExists ? "put" : "post";
+
+      await axios[method](`${import.meta.env.VITE_API_URL}${url}`, formData, {
+        withCredentials: true,
+      });
+
+      toast.success(isProfileExists ? "Profile updated" : "Profile saved");
       setFile(null);
       fetchProfiles();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to save profile");
+    } catch {
+      toast.error("Profile action failed");
     } finally {
       setSaveLoading(false);
     }
   };
 
-  // ---------------- UPDATE ----------------
-  const handleUpdate = async (e, id) => {
-    e.preventDefault();
-    if (!file) return toast.error("Select an image");
-
-    const formData = new FormData();
-    formData.append("profile", file);
-
-    try {
-      setSaveLoading(true);
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/profile/update-profile/${id}`,
-        formData,
-        { withCredentials: true }
-      );
-      toast.success("Profile updated successfully");
-      setFile(null);
-      fetchProfiles();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to update profile");
-    } finally {
-      setSaveLoading(false);
-    }
-  };
-
-  // ---------------- DELETE FLOW ----------------
-  const handleDeleteClick = (id) => {
-    setDeleteId(id);
-    setShowDeleteConfirm(true);
-  };
-
+  // ---------------- DELETE ----------------
   const confirmDelete = async () => {
     try {
       setDeleteLoading(true);
@@ -164,11 +138,10 @@ const compressImage = (file, maxSizeMB = 3) => {
         `${import.meta.env.VITE_API_URL}/profile/delete-profile/${deleteId}`,
         { withCredentials: true }
       );
-      toast.success("Profile deleted successfully");
+      toast.success("Profile deleted");
       fetchProfiles();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete profile");
+    } catch {
+      toast.error("Delete failed");
     } finally {
       setDeleteLoading(false);
       setShowDeleteConfirm(false);
@@ -176,40 +149,127 @@ const compressImage = (file, maxSizeMB = 3) => {
     }
   };
 
+  // ---------------- CREATE USER NAME (FIXED) ----------------
+  useEffect(() => {
+  if (user_name?.user_name_exist?.plan) {
+    setFree_user_name(false);
+  }
+}, [user_name]);
+const [startCreateUsername, setStartCreateUsername] = useState(false);
+
+const common_plan = free_user_name;
+  const create_user_name = async (e) => {
+    e.preventDefault();
+
+    if (!name.trim()) {
+      return toast.error("Username is required");
+    }
+  setStartCreateUsername(true);
+    try {
+      setUserNameLoading(true);
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/profile/user-name`,
+        { name },
+        { withCredentials: true }
+      );
+
+      if (res.data?.success) {
+  toast.success("Username created successfully");
+  user_name_get();  
+  setFree_user_name(false);
+  fetchProfiles();
+}
+ else {
+        toast.error(res.data?.message || "Failed to create username");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setUserNameLoading(false);
+     
+    }
+  };
+
+
   return (
     <div
-      className={`p-6 ${
+      className={`min-h-screen p-4 sm:p-6 relative ${
         theme === "dark"
           ? "bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 text-yellow-300"
           : "bg-gradient-to-tr from-black via-gray-900 to-black text-white"
       }`}
       onClick={() => {
         setBar(false);
-        setOpen(false);
+        // setOpen(false);
       }}
     >
-      <h1 className="text-3xl font-bold mb-6">👤 Profile</h1>
+      {/* NOTE */}
+      {note && (
+        <div className="mx-auto w-[92%] sm:w-[80%] md:w-[60%] lg:w-[45%] flex items-start gap-2 text-[10px] sm:text-[11px] text-amber-400 font-medium tracking-wide bg-amber-400/10 px-3 py-2 rounded-2xl border border-amber-400/30 scale-75 hover:scale-100 transition duration-150 absolute top-[-2rem] left-0 right-0">
+          <FaCrown className="text-lg sm:text-xl shrink-0 mt-[2px]" />
+          <span className="flex-1">
+            Pro users can create and update their username & bio. Free users can
+            create a username only once.
+          </span>
+          <button
+            onClick={() => setNote(false)}
+            className="w-5 h-5 text-[10px] rounded-full bg-green-700 text-white flex items-center justify-center hover:scale-105 transition"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
-        {/* PROFILE HEADER */}
-        <div className="flex items-center gap-4">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6">👤 Profile</h1>
+
+      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-2xl shadow-lg space-y-6 relative">
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row items-center gap-4">
           <img
-            src={profile_image}
+            src={profileImage}
             alt="profile"
-            className="w-20 h-20 rounded-full border hover:scale-150 transition cursor-pointer object-cover"
+            className="w-24 h-24 rounded-full border object-cover hover:scale-105 transition"
           />
 
-          <div>
-            <h2 className="text-xl font-semibold">{user?.email}</h2>
-            <p className="text-sm text-gray-500">
-              Plan: <b>{user?.plan || "Free"}</b>
-            </p>
+          <div className=" text-center sm:text-left ">
+            <h2 className="text-lg font-semibold">{user?.email}</h2>
+          <article className="text-sm text-gray-400">
+  <p className="w-full flex items-center">
+    <FaUserTie
+      className={`w-6 h-6 rounded-full p-1 border border-gray-700 ${
+        theme === "dark" ? "text-blue-500" : "text-green-200"
+      }`}
+    />
+    <span
+      className={`text-sm capitalize font-semibold pl-1 ${
+        theme === "dark" ? "text-blue-500" : "text-green-200"
+      }`}
+    >
+      {startCreateUsername && free_loading 
+        ? <FaSpinner className="mx-auto animate-spin" />
+        : user_name?.user_name_exist?.name || "user"}
+    </span>
+  </p>
+
+  {user_name?.user_name_exist?.plan && (
+    <span className="p-1">
+      Plan: {user_name.user_name_exist.plan}
+    </span>
+  )}
+</article>
+
+
+
+
 
             {isProfileExists && (
               <button
-                type="button"
-                onClick={() => handleDeleteClick(profile_id)}
-                className="w-full mt-2 p-2 text-[0.7rem] font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition"
+                onClick={() => {
+                  setDeleteId(profileId);
+                  setShowDeleteConfirm(true);
+                }}
+                className="mt-2 px-3 py-1 text-xs bg-red-600 hover:bg-red-700 rounded-lg text-white"
               >
                 Delete Profile
               </button>
@@ -219,29 +279,39 @@ const compressImage = (file, maxSizeMB = 3) => {
 
         {/* FORM */}
         <form
-          onSubmit={(e) =>
-            isProfileExists
-              ? handleUpdate(e, profile_id)
-              : handleUpload(e)
-          }
-          className="max-w-md mx-auto p-4 mt-6"
+          onSubmit={submitProfile}
+          className="space-y-4 border border-gray-700 p-4 rounded-xl"
         >
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="create user name"
-            className="w-full px-4 py-2 rounded-lg border mb-4 dark:bg-gray-700"
-          />
+         {common_plan &&    <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Create username"
+              className="flex-1 px-4 py-2 rounded-lg dark:bg-gray-700 outline-none capitalize"
+            />
+              <button
+                onClick={create_user_name}
+                disabled={userNameLoading}
+                className="sm:w-40 w-full py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+              >
+                {userNameLoading ? (
+                  <LiaSpinnerSolid className="mx-auto animate-spin" />
+                ) :free_user_name ? "Create New":'Update'
+                }
+              </button>
+          </div>
+            }
 
-          <div className="relative w-full h-32 border-2 border-dashed rounded-xl flex flex-col items-center justify-center">
+          {/* IMAGE */}
+          <div className="relative h-32 border border-dashed rounded-xl flex items-center justify-center hover:bg-gray-700/30 transition">
             <input
               type="file"
               accept="image/png,image/jpeg"
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={handleFileChange}
             />
-            <p className="text-sm">
+            <p className="text-sm text-blue-700">
               {file ? file.name : "Choose profile image"}
             </p>
           </div>
@@ -249,15 +319,10 @@ const compressImage = (file, maxSizeMB = 3) => {
           <button
             type="submit"
             disabled={saveLoading}
-            className={`w-full py-2 mt-3 rounded-lg text-white transition
-              ${
-                saveLoading
-                  ? "bg-blue-300 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
+            className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
           >
             {saveLoading ? (
-              <LiaSpinnerSolid className="animate-spin mx-auto" />
+              <LiaSpinnerSolid className="mx-auto animate-spin" />
             ) : isProfileExists ? (
               "Update Profile"
             ) : (
@@ -267,32 +332,33 @@ const compressImage = (file, maxSizeMB = 3) => {
         </form>
 
         {/* BIO */}
-        <label className="block mt-4 mb-2 text-sm">Bio</label>
-        {user?.plan === "pro" ? (
-          <textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700"
-            rows="3"
-          />
-        ) : (
-          <div className="p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900 flex justify-between">
-            <p>🚀 Bio is a Pro feature</p>
-            <Link to="/Dashboard/Billing">
-              <TbMoodEdit className="text-xl animate-pulse" />
-            </Link>
-          </div>
-        )}
+        <div>
+          <label className="block mb-2 text-sm">Bio</label>
+          {user?.plan === "pro" ? (
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows="3"
+              className="w-full px-4 py-2 rounded-lg dark:bg-gray-700"
+            />
+          ) : (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900">
+              <p>🚀 Bio is a Pro feature</p>
+              <Link to="/Dashboard/Billing">
+                <TbMoodEdit className="text-xl animate-pulse" />
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* 🔥 DELETE CONFIRM MODAL */}
+      {/* DELETE MODAL */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-4 w-72 text-center">
-            <p className="text-red-700 font-semibold mb-4">
-              Are you sure you want to delete?
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-5 w-72 text-center">
+            <p className="text-red-600 font-semibold mb-4">
+              Delete this profile?
             </p>
-
             <div className="flex justify-center gap-3">
               <button
                 onClick={confirmDelete}
@@ -301,13 +367,12 @@ const compressImage = (file, maxSizeMB = 3) => {
                 {deleteLoading ? (
                   <LiaSpinnerSolid className="animate-spin mx-auto" />
                 ) : (
-                  "Yes, Delete"
+                  "Yes"
                 )}
               </button>
-
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-1 bg-gray-700 rounded"
+                className="px-4 py-1 bg-gray-700 text-white rounded"
               >
                 Cancel
               </button>

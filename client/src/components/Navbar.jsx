@@ -13,6 +13,7 @@ import { IoNotificationsCircleSharp } from "react-icons/io5";
 import { useAppContext } from "./ContextApi";
 import NavLinks from "./pages/NavLinks";
 import profileImage from '../assets/cloud.svg'
+import { FaSpinner } from "react-icons/fa";
 const Navbar = () => {
   const {
     theme,
@@ -26,7 +27,8 @@ const Navbar = () => {
     Googleuser,
     setGoogleUser,
     setVeified,
-    profiles
+    profiles,user_name,
+    free_loading
   } = useAppContext();
 
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ const Navbar = () => {
     ? profiles[0]?.image?.url
     : deafault_user_image;
 
-
+const [startCreateUsername, setStartCreateUsername] = useState(false);
   /* ================= LOGOUT ================= */
   const logout = async () => {
     try {
@@ -145,10 +147,14 @@ const Navbar = () => {
                   
                     </div>
                   <p className="font-semibold text-black capitalize">
-                    {currentUser?.name}
+                    
+                     {startCreateUsername && free_loading 
+                            ? <FaSpinner className="mx-auto animate-spin" />
+                            : user_name?.user_name_exist?.name || currentUser?.name}
                   </p>
                   <p className="text-xs text-gray-600 truncate">
                     {currentUser?.email}
+                   
                   </p>
                 </div>
 

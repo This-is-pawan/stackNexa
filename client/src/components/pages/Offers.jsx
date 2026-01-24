@@ -3,44 +3,57 @@ import { useAppContext } from "../ContextApi";
 import { Link } from "react-router-dom";
 
 const Offers = () => {
+  const { auth, Googleuser } = useAppContext();
 
-    const { theme, auth,setBar ,setOpen,Googleuser, setGoogleUser} = useAppContext();
-      const isLoggedIn = auth?.isAuthenticated || Boolean(Googleuser?.isAuthenticated)
+  const isLoggedIn =
+    auth?.isAuthenticated || Boolean(Googleuser?.isAuthenticated);
+
   const [show, setShow] = useState(true);
-
   if (!show) return null;
 
   return (
-    <div
-      className={`w-full justify-center fixed top-[4rem] left-0 right-0  px-4 p-1 animate-pulse z-20
-      ${
-        theme === "dark"
-          ? "bg-gradient-to-r from-pink-600 to-purple-700 text-white"
-          : "bg-gradient-to-r from-yellow-400 to-orange-500 text-black"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center  sm:text-left ">
-        
+    <div className="fixed top-[4rem] left-0 right-0 z-20 px-2">
+      <div
+        className="
+          mx-auto w-[92%] sm:w-[80%] md:w-[60%] lg:w-[45%]
+          flex items-start sm:items-center justify-between gap-2
+          text-[10px] sm:text-[11px]
+          text-amber-400 font-medium tracking-wide
+          bg-amber-400/10 px-3 py-2 rounded-2xl
+          border border-amber-400/30  scale-75 hover:scale-100 transition duration-150
+
+        "
+      >
         {/* Offer Text */}
-        <p className=" text-sm sm:text-base font-semibold">
-          🚀 <span className="font-bold">Launch Offer – StackNexa</span> |
+        <span className="flex-1">
+          🚀 <span className="font-semibold">Launch Offer:-StackNexa</span>{" "}
           Free Projects + Premium Plans at{" "}
-          <span className="underline font-bold">₹199 / ₹499</span>
-        </p>
+          <span className="underline font-semibold">₹199 / ₹499</span>
+        </span>
 
         {/* Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           <Link
             to={isLoggedIn ? "/more-about" : "/register"}
-            className="px-4 py-1.5 rounded-full bg-black text-white text-sm font-semibold hover:scale-105 transition"
+            className="
+              px-3 py-1 rounded-full
+              bg-amber-400/20 text-amber-300
+              text-[10px] sm:text-[11px]
+              hover:bg-amber-400/30 transition
+            "
           >
             Get Started
           </Link>
 
           <button
             onClick={() => setShow(false)}
-            className="text-lg font-bold px-2 hover:opacity-70"
             aria-label="Close offer"
+            className="
+              w-5 h-5 text-[10px]
+        rounded-full bg-green-700 text-white
+        flex items-center justify-center
+        hover:scale-105 transition
+            "
           >
             ✕
           </button>

@@ -189,6 +189,28 @@ const fetchProfiles = async () => {
     }
   };
 
+// user-name-get
+const [user_name, setUser_name] = useState(null);
+ const [free_loading, setFree_loading] = useState(true);
+const user_name_get = async () => {
+  try {
+    const result = await axios.get(
+      `${import.meta.env.VITE_API_URL}/profile/user-name-get`,
+      { withCredentials: true }
+    );
+    setUser_name(result?.data);
+  } catch {
+    toast.error("Failed to access username");
+  }finally{
+    setFree_loading(false)
+
+  }
+};
+
+useEffect(() => {
+  user_name_get();
+}, []);
+
 
 
   useEffect(() => {
@@ -207,6 +229,7 @@ const fetchProfiles = async () => {
         setOpen,
         Handle_verified,
         loading,
+        setLoading,
         otpExpire_time,
         setOtpExpire_time,
         registerUsers,
@@ -217,7 +240,10 @@ const fetchProfiles = async () => {
         setVeified,
         profiles, 
         setProfiles,
-        fetchProfiles
+        fetchProfiles,
+        user_name ,
+        user_name_get,
+        free_loading,
       }}
     >
       {children}

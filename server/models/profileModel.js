@@ -27,14 +27,8 @@ const UserSchema = new mongoose.Schema({
     default: "free",
   },
 });
-const UserName=mongoose.model("user_name", UserSchema);
+const UserNameModel=mongoose.model("user_name", UserSchema);
 
 
 
-
-
-
-
-
-
-module.exports = {profileModel,UserName}
+module.exports = {profileModel,UserNameModel}
