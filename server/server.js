@@ -5,6 +5,7 @@ dotenv.config();
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
+const MongoStore=require('connect-mongo').default;
 const connection = require("./config/DBFile");
 const { router } = require("./routes/Jwt_Route");
 const {routers}=require('./routes/profile_route')
@@ -22,13 +23,28 @@ app.use(
   }),
 );
 
+
 app.use(
   session({
+    name: "stacknexa.sid",
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-  }),
+
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: "sessions",
+    }),
+
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+    },
+  })
 );
+
 
 app.use(passport.initialize());
 app.use(passport.session());
