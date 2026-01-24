@@ -75,8 +75,6 @@ const compressImage = (file, maxSizeMB = 3) => {
 };
 
 
-
-
   // ---------------- FILE CHANGE ----------------
 
  const handleFileChange = async (e) => {
@@ -112,7 +110,7 @@ const compressImage = (file, maxSizeMB = 3) => {
     try {
       setSaveLoading(true);
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/upload-profile`,
+        `${import.meta.env.VITE_API_URL}/profile/upload-profile`,
         formData,
         { withCredentials: true }
       );
@@ -138,7 +136,7 @@ const compressImage = (file, maxSizeMB = 3) => {
     try {
       setSaveLoading(true);
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/update-profile/${id}`,
+        `${import.meta.env.VITE_API_URL}/profile/update-profile/${id}`,
         formData,
         { withCredentials: true }
       );
@@ -163,7 +161,7 @@ const compressImage = (file, maxSizeMB = 3) => {
     try {
       setDeleteLoading(true);
       await axios.delete(
-        `${import.meta.env.VITE_API_URL}/delete-profile/${deleteId}`,
+        `${import.meta.env.VITE_API_URL}/profile/delete-profile/${deleteId}`,
         { withCredentials: true }
       );
       toast.success("Profile deleted successfully");
@@ -211,7 +209,7 @@ const compressImage = (file, maxSizeMB = 3) => {
               <button
                 type="button"
                 onClick={() => handleDeleteClick(profile_id)}
-                className="w-full mt-2 p-2 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition"
+                className="w-full mt-2 p-2 text-[0.7rem] font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition"
               >
                 Delete Profile
               </button>
@@ -232,7 +230,7 @@ const compressImage = (file, maxSizeMB = 3) => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Full name"
+            placeholder="create user name"
             className="w-full px-4 py-2 rounded-lg border mb-4 dark:bg-gray-700"
           />
 

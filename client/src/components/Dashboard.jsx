@@ -64,7 +64,7 @@ const Dashboard = () => {
         {isDesktop && (
           <aside
             className={`w-full relative h-full overflow-hidden ${
-              theme === "dark" ? "bg-gray-900" : "bg-black"
+              theme === "dark" ? "bg-gray-800" : "bg-gray-950"
             }`}
           >
             {/* TOGGLE ICON */}

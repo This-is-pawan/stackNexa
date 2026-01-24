@@ -182,7 +182,7 @@ const [verified, setVeified] = useState(() => {
    const [profiles, setProfiles] = useState([]);
 const fetchProfiles = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/profiles`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/profile/profiles`);
       setProfiles(res?.data?.data);
     } catch (err) {
       console.error("Fetch error", err);

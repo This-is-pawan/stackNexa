@@ -17,5 +17,24 @@ const profileSchema = new mongoose.Schema(
 );
 
 const profileModel=mongoose.model("user_profile_images", profileSchema);
+// 
+const UserSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  plan: {
+    type: String,
+    enum: ["free", "pro"],
+    default: "free",
+  },
+});
+const UserName=mongoose.model("user_name", UserSchema);
 
-module.exports = profileModel
+
+
+
+
+
+
+
+
+module.exports = {profileModel,UserName}
