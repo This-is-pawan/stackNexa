@@ -237,6 +237,35 @@ const GoogleAllUsers = async (req, res) => {
   }
 };
 
+const delete_user_permanently = async (req, res) => {
+  try {
+    const { userId } = req.params; 
+    console.log("Received userId:", userId);
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User ID is required" });
+    }
 
+    const deletedUser = await JWTUser.findByIdAndDelete(userId);
 
-module.exports = { Register, Login, Logout, isAuthenticated, verifyLoginOtp,GoogleAllUsers };
+    if (!deletedUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User deleted permanently",
+    });
+
+  } catch (error) {
+    console.error("DELETE USER ERROR:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Delete failed" });
+  }
+};
+
+module.exports = { Register, Login, Logout, isAuthenticated, verifyLoginOtp,GoogleAllUsers,delete_user_permanently };

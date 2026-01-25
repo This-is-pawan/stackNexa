@@ -11,7 +11,9 @@ import { toast } from "react-toastify";
 
 const Profile = () => {
   const fileInputRef = useRef(null);
-  const { user, theme, profiles, setBar, setOpen, fetchProfiles ,user_name,user_name_get,free_loading,} =useAppContext();
+  const {auth, user, theme, profiles, setBar, setOpen, fetchProfiles ,user_name,user_name_get,free_loading,} =useAppContext();
+  
+
 
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
@@ -22,7 +24,7 @@ const Profile = () => {
   const [userNameLoading, setUserNameLoading] = useState(false);
   const [note, setNote] = useState(true);
   const [free_user_name, setFree_user_name] = useState(true);
- 
+ const [file_size,setFile_size]=useState('')
   
   
   // const [pro_user_name, setPro_user_name] = useState(true);
@@ -92,9 +94,7 @@ const Profile = () => {
     try {
       const compressed = await compressImage(selected, 3);
       setFile(compressed);
-      toast.success(
-        `Optimized to ${(compressed.size / 1024 / 1024).toFixed(2)} MB`
-      );
+      setFile_size((compressed.size / 1024 / 1024).toFixed(2))
     } catch {
       toast.error("Image processing failed");
     }
@@ -260,9 +260,6 @@ const common_plan = free_user_name;
 </article>
 
 
-
-
-
             {isProfileExists && (
               <button
                 onClick={() => {
@@ -304,16 +301,19 @@ const common_plan = free_user_name;
             }
 
           {/* IMAGE */}
-          <div className="relative h-32 border border-dashed rounded-xl flex items-center justify-center hover:bg-gray-700/30 transition">
+          <div className="relative h-32 border border-dashed rounded-xl flex items-center justify-center hover:bg-gray-700/30 transition ">
+
             <input
               type="file"
               accept="image/png,image/jpeg"
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={handleFileChange}
             />
+           
             <p className="text-sm text-blue-700">
               {file ? file.name : "Choose profile image"}
             </p>
+             <p className="text-sm text-blue-400 absolute top-1">{`File-Size: ${file_size}MB`}</p>
           </div>
 
           <button

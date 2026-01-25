@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { theme, setAuth ,setBar,} = useAppContext();
+  const { theme, setAuth ,setBar, checkAuth} = useAppContext();
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -25,11 +25,11 @@ const Login = () => {
       );
 
       setAuth({
-        user: res.data.user,
+        user: res?.data?.user,
         isAuthenticated: true,
         loading: false,
       });
-
+await checkAuth();
       toast.success("Login successful");
       navigate("/dashboard");
     } catch (err) {

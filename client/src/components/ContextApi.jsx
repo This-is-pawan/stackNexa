@@ -59,7 +59,9 @@ const ContextApi = ({ children }) => {
   /* ================= UI ================= */
   const [bar, setBar] = useState(false);
   const [open, setOpen] = useState(false);
-
+const [deleteId, setDeleteId] = useState(null);
+ const [deleteLoading, setDeleteLoading] = useState(false);
+ const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   /* ================= OTP ================= */
   const [loading, setLoading] = useState(false);
   const [otpExpire_time, setOtpExpire_time] = useState(() =>
@@ -184,6 +186,7 @@ const fetchProfiles = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/profile/profiles`);
       setProfiles(res?.data?.data);
+      setDeleteId(res?.data?.data?.[0]?._id)
     } catch (err) {
       console.error("Fetch error", err);
     }
@@ -210,6 +213,9 @@ const user_name_get = async () => {
 useEffect(() => {
   user_name_get();
 }, []);
+
+// delete the profile image
+
 
 
 
@@ -244,6 +250,7 @@ useEffect(() => {
         user_name ,
         user_name_get,
         free_loading,
+         checkAuth,
       }}
     >
       {children}
