@@ -144,7 +144,7 @@ const [verified, setVeified] = useState(() => {
         setRegisterUsers(data.users || []);
       }
     } catch (error) {
-      console.log(error.response?.data);
+      console.log(error.message||'google auth fail');
     }
   };
 
@@ -214,13 +214,32 @@ useEffect(() => {
   user_name_get();
 }, []);
 
-// delete the profile image
-
-
+//  payment-reciept 
+const [plan,setPlan]=useState(null)
+const [plan_loading,setPlan_loading]=useState(true)
+const payment_reciept=async () => {
+setPlan_loading(true);
+  try {
+    const result=await axios.get(`${import.meta.env.VITE_API_URL}/api/project/payment-reciept`,{ withCredentials: true })
+    
+    
+    if(result.data.success){
+   setPlan(result?.data?.result)
+    }
+else{
+ toast.error('recipt fetch ')
+}
+  } catch (error) {
+    toast.error(error)
+  }finally{
+    setPlan_loading(false)
+  }
+}
 
 
   useEffect(() => {
     fetchProfiles();
+    payment_reciept()
   }, []);
   return (
     <AppContext.Provider
@@ -251,6 +270,9 @@ useEffect(() => {
         user_name_get,
         free_loading,
          checkAuth,
+         plan,
+         plan_loading,
+         payment_reciept
       }}
     >
       {children}

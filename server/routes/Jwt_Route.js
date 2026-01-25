@@ -10,7 +10,7 @@ const {
 } = require("../controllers/Jwt_Auth_controller");
 const  Verify  = require("../middleware/Jwtmiddleware");
 const { AllUsers } = require("../controllers/UsersData");
-const { createOrder, verifyPayment, paymentSuccess } = require("../controllers/RazorPay");
+const { createOrder, verifyPayment, paymentSuccess, payment_receipt} = require("../controllers/RazorPay");
 
 const router = express.Router();
 router.post("/register", Register);
@@ -22,7 +22,8 @@ router.post("/verify-otp", verifyLoginOtp);
 router.post('/create-order',createOrder)
 router.post('/verify-payment',verifyPayment)
 router.get('/payment-success',paymentSuccess)
-router.get('/google-all-users',GoogleAllUsers)
+router.get('/payment-success',paymentSuccess)
+router.get('/payment-reciept',payment_receipt)
 router.delete("/delete-user-account/:userId",delete_user_permanently)
 
 module.exports = { router };

@@ -87,5 +87,30 @@ const paymentSuccess = async (req, res) => {
   const paymentId = req.query.paymentId;
   res.json({ success: true, message: "Payment success", paymentId });
 };
+const payment_receipt = async (req, res) => {
+  userId = req.user;
+  try {
+    const result = await Payments.findOne({userId })
+      .sort({ createdAt: -1 }); 
 
-module.exports = { createOrder, verifyPayment, paymentSuccess };
+    if (!result) {
+      return res.json({
+        success: false,
+        message: "No payment record found for this user",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Payment receipt fetched successfully",
+      result,
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Payment receipt failed",
+      error: error.message,
+    });
+  }
+};
+module.exports = { createOrder, verifyPayment, paymentSuccess,payment_receipt };

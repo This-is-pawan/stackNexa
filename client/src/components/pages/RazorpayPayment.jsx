@@ -23,7 +23,7 @@ const loadRazorpay = () => {
 };
 
 const RazorpayPayment = () => {
-  const { theme } = useAppContext();
+  const { theme ,payment_reciept} = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -96,6 +96,7 @@ const RazorpayPayment = () => {
                 status: verifyRes.data.success ? "Success" : "Failed",
               },
             });
+            await payment_reciept();
           } catch {
             toast.error("Payment verification failed");
           } finally {

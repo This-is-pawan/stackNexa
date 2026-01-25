@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../ContextApi";
-
+import { LiaSpinnerSolid } from "react-icons/lia";
 const Billing = () => {
-  const { user, theme ,setBar,setOpen} = useAppContext();
+  const { user, theme ,setBar,setOpen,plan,plan_loading} = useAppContext();
   const navigate = useNavigate();
 
   const plans = [
@@ -80,7 +80,11 @@ const Billing = () => {
         <p>
           Current Plan:
           <span className="ml-2 font-semibold text-blue-500">
-            {user?.plan || "Free"}
+          {plan_loading ? (
+  <LiaSpinnerSolid className="animate-spin mx-auto" />
+) : (
+  plan?.plan || "free"
+)}
           </span>
         </p>
       </div>
