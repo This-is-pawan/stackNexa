@@ -74,28 +74,35 @@ const RazorpayPayment = () => {
         description: `${planName} Plan`,
         order_id: order.id,
 
-        handler: async (response) => {
-          try {
-            const verifyRes = await axios.post(
-              `${import.meta.env.VITE_API_URL}/api/project/verify-payment`,
-              response
-            );
+    handler: async (response) => {
+  try {
+    const verifyRes = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/project/verify-payment`,
+      {
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature,
+        amount, 
+        plan: planName.toLowerCase(), 
+        duration: "monthly",          
+      }
+    );
 
-            navigate("/receipt", {
-              state: {
-                paymentId: response.razorpay_payment_id,
-                orderId: response.razorpay_order_id,
-                signature: response.razorpay_signature,
-                amount,
-                status: verifyRes.data.success ? "Success" : "Failed",
-              },
-            });
-          } catch {
-            toast.error("Payment verification failed");
-          } finally {
-            isProcessing.current = false;
-          }
-        },
+    navigate("/receipt", {
+      state: {
+        paymentId: response.razorpay_payment_id,
+        orderId: response.razorpay_order_id,
+        signature: response.razorpay_signature,
+        amount,
+        status: verifyRes.data.success ? "Success" : "Failed",
+      },
+    });
+  } catch {
+    toast.error("Payment verification failed");
+  } finally {
+    isProcessing.current = false;
+  }
+},
 
         modal: {
           ondismiss: () => {

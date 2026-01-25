@@ -1,6 +1,7 @@
- require("dotenv").config();
+require("dotenv").config();
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
+const { Payments } = require("../models/paymentModel");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -10,7 +11,8 @@ const razorpay = new Razorpay({
 const createOrder = async (req, res) => {
   try {
     const { amount } = req.body;
-    if (!amount) return res.json({ success: false, message: "Amount is required" });
+    if (!amount)
+      return res.json({ success: false, message: "Amount is required" });
 
     const order = await razorpay.orders.create({
       amount: amount * 100, // amount in paise
@@ -26,12 +28,28 @@ const createOrder = async (req, res) => {
 
 // ===== Verify Payment =====
 const verifyPayment = async (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+  const {
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+    amount,
+    plan,
+    duration,
+  } = req.body;
+
 
   if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-    return res.json({ success: false, message: "Missing payment verification data" });
+    return res.json({
+      success: false,
+      message: "Missing payment verification data",
+    });
   }
-
+if (!amount || !plan) {
+return res.json({
+success: false,
+message: "Amount and plan are required",
+});
+}
   const body = razorpay_order_id + "|" + razorpay_payment_id;
   const expectedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
@@ -39,9 +57,25 @@ const verifyPayment = async (req, res) => {
     .digest("hex");
 
   if (expectedSignature === razorpay_signature) {
-    res.json({ success: true, message: "Payment signature verified successfully" });
+    const payment = await Payments.create({
+      paymentId: razorpay_payment_id,
+      orderId: razorpay_order_id,
+      signature: razorpay_signature,
+      amount: amount,
+      status: "Success",
+      plan: plan.toLowerCase(), 
+duration: duration === "month" ? "monthly" : "yearly", //
+    });
+    res.json({
+      success: true,
+      message: "Payment signature verified successfully",
+      payment,
+    });
   } else {
-    res.json({ success: false, message: "Payment signature verification failed!" });
+    res.json({
+      success: false,
+      message: "Payment signature verification failed!",
+    });
   }
 };
 
@@ -51,6 +85,4 @@ const paymentSuccess = async (req, res) => {
   res.json({ success: true, message: "Payment success", paymentId });
 };
 
-
-
-module.exports = {createOrder,verifyPayment,paymentSuccess};
+module.exports = { createOrder, verifyPayment, paymentSuccess };

@@ -1,12 +1,14 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../components/ContextApi";
-
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 const ReceiptPage = () => {
   const { theme } = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
   const receipt = location.state;
+
+
 
   if (!receipt) {
     return (
@@ -48,11 +50,13 @@ const ReceiptPage = () => {
             <span
               className={
                 receipt.status === "Success"
-                  ? "text-green-600 font-bold"
-                  : "text-red-600 font-bold"
+                  ? "text-green-600 font-bold flex items-center "
+                  : "text-red-600 font-bold flex items-center "
               }
             >
+              
               {receipt.status}
+         <span>{receipt.status==='Success'? <FaCheckCircle className="text-xs ml-1"/>:<FaTimesCircle className="text-xs ml-1"/> }</span>
             </span>
           </Row>
 
