@@ -15,10 +15,12 @@ const createOrder = async (req, res) => {
       return res.json({ success: false, message: "Amount is required" });
 
     const order = await razorpay.orders.create({
-      amount: amount * 100, // amount in paise
+      amount: amount * 100, 
       currency: "INR",
       receipt: "receipt_" + Date.now(),
     });
+
+
 
     res.json({ success: true, message: "Order created successfully", order });
   } catch (error) {
@@ -59,13 +61,14 @@ message: "Amount and plan are required",
   if (expectedSignature === razorpay_signature) {
     const payment = await Payments.create({
       paymentId: razorpay_payment_id,
-      orderId: razorpay_order_id,
+      orderId: razorpay_order_id || "temp_" + Date.now(),
       signature: razorpay_signature,
       amount: amount,
       status: "Success",
       plan: plan.toLowerCase(), 
-duration: duration === "month" ? "monthly" : "yearly", //
+duration: duration === "month" ? "monthly" : "yearly",
     });
+
     res.json({
       success: true,
       message: "Payment signature verified successfully",

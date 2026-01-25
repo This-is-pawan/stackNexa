@@ -54,7 +54,7 @@ const RazorpayPayment = () => {
       /* 2️⃣ Create Order */
       const { data } = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/project/create-order`,
-        { amount: Number(amount) }
+        { amount: Number(amount) },
       );
 
       if (!data?.success || !data?.order) {
@@ -73,36 +73,35 @@ const RazorpayPayment = () => {
         name: "Stacknexa",
         description: `${planName} Plan`,
         order_id: order.id,
-
-    handler: async (response) => {
+        handler: async (response) => {
   try {
     const verifyRes = await axios.post(
       `${import.meta.env.VITE_API_URL}/api/project/verify-payment`,
       {
-        razorpay_order_id: response.razorpay_order_id,
+        razorpay_order_id: response.razorpay_order_id || order.id, // 🔥 fallback to created order id
         razorpay_payment_id: response.razorpay_payment_id,
         razorpay_signature: response.razorpay_signature,
-        amount, 
-        plan: planName.toLowerCase(), 
-        duration: "monthly",          
+        amount,
+        plan: planName.toLowerCase(),
+        duration: "monthly",
       }
     );
 
-    navigate("/receipt", {
-      state: {
-        paymentId: response.razorpay_payment_id,
-        orderId: response.razorpay_order_id,
-        signature: response.razorpay_signature,
-        amount,
-        status: verifyRes.data.success ? "Success" : "Failed",
-      },
-    });
-  } catch {
-    toast.error("Payment verification failed");
-  } finally {
-    isProcessing.current = false;
-  }
-},
+            navigate("/receipt", {
+              state: {
+                paymentId: response.razorpay_payment_id,
+                orderId: response.razorpay_order_id,
+                signature: response.razorpay_signature,
+                amount,
+                status: verifyRes.data.success ? "Success" : "Failed",
+              },
+            });
+          } catch {
+            toast.error("Payment verification failed");
+          } finally {
+            isProcessing.current = false;
+          }
+        },
 
         modal: {
           ondismiss: () => {
@@ -130,11 +129,13 @@ const RazorpayPayment = () => {
           : "bg-gradient-to-tr from-black via-gray-900 to-black text-white"
       }`}
     >
-      <div className={` ${
-        theme === "dark"
-          ? "bg-gradient-to-tr from-gray-900 via-gray-700 to-gray-700 text-yellow-300"
-          : "bg-gradient-to-tr from-black via-gray-900 to-black text-white"
-      } rounded-2xl shadow-xl p-8 max-w-md w-full bg-whit`}>
+      <div
+        className={` ${
+          theme === "dark"
+            ? "bg-gradient-to-tr from-gray-900 via-gray-700 to-gray-700 text-yellow-300"
+            : "bg-gradient-to-tr from-black via-gray-900 to-black text-white"
+        } rounded-2xl shadow-xl p-8 max-w-md w-full bg-whit`}
+      >
         <h2 className="text-2xl font-bold text-center mb-4">
           {planName} Plan Payment
         </h2>
