@@ -313,7 +313,7 @@ const common_plan = free_user_name;
             <p className="text-sm text-blue-700">
               {file ? file.name : "Choose profile image"}
             </p>
-             <p className="text-sm text-blue-400 absolute top-1">{`File-Size: ${file_size}MB`}</p>
+             <p className="text-sm text-blue-400 absolute top-1 capitalize ">{`Automatically resizes file size: ${file_size}MB`}</p>
           </div>
 
           <button
