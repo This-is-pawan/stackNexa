@@ -152,7 +152,7 @@ useEffect(() => {
       </div>
 
       {showSecurityCheck && (
-        <div className="bg-yellow-50 dark:bg-yellow-900 rounded-xl p-5 shadow mt-4 max-w-3xl mx-auto absolute left-1/2 -translate-x-1/2 top-[12rem]">
+        <div className="w-full max-[900px]:max-w-[80%] bg-yellow-50 dark:bg-yellow-900 rounded-xl p-5 shadow mt-4 max-w-3xl mx-auto absolute left-1/2 -translate-x-1/2 top-[12rem]">
           <h3 className="text-lg font-semibold mb-3 text-yellow-700">
             ⚠️ Before you delete your account
           </h3>
