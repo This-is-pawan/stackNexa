@@ -23,6 +23,8 @@ const Profile = () => {
     user_name_get,
     free_loading,
     plan,
+    get_bio,
+    user_bio,
   } = useAppContext();
 
   const [name, setName] = useState(user?.name || "");
@@ -163,14 +165,14 @@ const Profile = () => {
   useEffect(() => {
     if (user_name?.user_name_exist?.plan) {
       setFree_user_name(common_plan);
+      setUsernamePending(false);
     }
   }, [user_name]);
 
   const [startCreateUsername, setStartCreateUsername] = useState(false);
 
   const common_plan = plan?.plan || free_user_name;
-  
-  
+
   const create_user_name = async (e) => {
     e.preventDefault();
 
@@ -203,40 +205,72 @@ const Profile = () => {
   };
   //user_name
   const isFreeUser = common_plan === "free";
-const hasUsername = !!user_name?.user_name_exist?.name;
-const Update_user_name = async (e, userId) => {
+  const hasUsername = !!user_name?.user_name_exist?.name;
+  const [usernamePending, setUsernamePending] = useState(false);
+  const Update_user_name = async (e, userId) => {
+    e.preventDefault();
+
+    const currentName = user_name?.user_name_exist?.name;
+
+    // ✅ FRONTEND VALIDATION
+    if (!name || !name.trim()) {
+      return toast.error("Username is required");
+    }
+
+    // ✅ SAME NAME CHECK (UX)
+    if (name.trim() === currentName) {
+      return toast.error("Username is already updated");
+    }
+    try {
+      setUserNameLoading(true);
+      setUsernamePending(true);
+
+      const result = await axios.put(
+        `${import.meta.env.VITE_API_URL}/profile/user-name-update/${userId}`,
+        { name: name.trim() },
+        { withCredentials: true },
+      );
+
+      if (result.data.success) {
+        toast.success("Username updated successfully");
+        await user_name_get();
+        fetchProfiles();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Username update failed");
+    } finally {
+      setUserNameLoading(false);
+    }
+  };
+  // bio create and update
+ const [bio_loading,setBio_loading]=useState(false)
+  const bio_create = async (e, userId) => {
   e.preventDefault();
 
-  const currentName = user_name?.user_name_exist?.name;
-
-  // ✅ FRONTEND VALIDATION
-  if (!name || !name.trim()) {
-    return toast.error("Username is required");
-  }
-
-  // ✅ SAME NAME CHECK (UX)
-  if (name.trim() === currentName) {
-    return toast.error("Username is already updated");
-  }
-setUserNameLoading(true);
   try {
-    const result = await axios.put(
-      `${import.meta.env.VITE_API_URL}/profile/user-name-update/${userId}`,
-      { name: name.trim() },
+    setBio_loading(true);
+
+    const isCreate = !user_bio?.bio?._id;
+
+    const url = isCreate
+      ? "/profile/user-bio"
+      : `/profile/user-bio-update/${userId}`;
+
+    const method = isCreate ? "post" : "put";
+
+    await axios[method](
+      `${import.meta.env.VITE_API_URL}${url}`,
+      { bio },
       { withCredentials: true }
     );
 
-    if (result.data.success) {
-      toast.success("Username updated successfully");
-      user_name_get();
-      fetchProfiles();
-    }
+    toast.success(isCreate ? "Bio saved" : "Bio updated");
+    setBio("")
+    get_bio()
   } catch (error) {
-    toast.error(
-      error.response?.data?.message || "Username update failed"
-    );
-  }finally{
-    setUserNameLoading(false);
+    toast.error(error?.response?.data?.message || "Something went wrong");
+  } finally {
+    setBio_loading(false);
   }
 };
   return (
@@ -293,7 +327,10 @@ setUserNameLoading(true);
                     theme === "dark" ? "text-blue-500" : "text-green-200"
                   }`}
                 >
-                  {startCreateUsername && free_loading ? (
+                  {
+                  userNameLoading ||
+                  usernamePending ||
+                  startCreateUsername ? (
                     <FaSpinner className="mx-auto animate-spin" />
                   ) : (
                     user_name?.user_name_exist?.name || "user"
@@ -320,52 +357,63 @@ setUserNameLoading(true);
               </button>
             )}
           </div>
+         
         </div>
-
+        
+ <div
+className={`${
+        theme === "dark"
+          ?  "bg-gradient-to-tl from-yellow-400 via-blue-200 to-orange-300 text-black" :"bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white"
+         
+      } shadow-xl rounded-xl p-4 `}
+>
+  <p className="text-sm tracking-wide leading-relaxed flex items-center gap-2">
+    {bio_loading ? (
+      <LiaSpinnerSolid className="animate-spin text-lg opacity-70" />
+    ) : (
+      user_bio?.bio?.bio || "No bio added yet."
+    )}
+  </p>
+</div>
         {/* FORM */}
         <form
           onSubmit={submitProfile}
           className="space-y-4 border border-gray-700 p-4 rounded-xl"
         >
-{
+          {((isFreeUser && !hasUsername) || !isFreeUser) && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={isFreeUser ? "Create username" : "Update username"}
+                className="flex-1 px-4 py-2 rounded-lg dark:bg-gray-700 outline-none capitalize"
+              />
 
-(
- 
-  (isFreeUser && !hasUsername) || !isFreeUser
-) && (
-  <div className="flex flex-col sm:flex-row gap-3">
-    <input
-      type="text"
-      value={name}
-      onChange={(e) => setName(e.target.value)}
-      placeholder={
-        isFreeUser ? "Create username" : "Update username"
-      }
-      className="flex-1 px-4 py-2 rounded-lg dark:bg-gray-700 outline-none capitalize"
-    />
-
-    <button
-      type="button"
-      disabled={userNameLoading}
-      onClick={(e) => {
-        if (isFreeUser && !hasUsername) {
-          create_user_name(e); 
-        } else if (!isFreeUser) {
-          Update_user_name(e, user_name?.user_name_exist?._id); 
-        }
-      }}
-      className="sm:w-40 w-full py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-    >
-      {userNameLoading ? (
-        <LiaSpinnerSolid className="mx-auto animate-spin" />
-      ) : isFreeUser ? (
-        "Create"
-      ) : (
-        "Update"
-      )}
-    </button>
-  </div>
-)}
+              <button
+                // type="button"
+                disabled={userNameLoading}
+                onClick={(e) => {
+                  if (isFreeUser && !hasUsername) {
+                    create_user_name(e);
+                  } else if (!isFreeUser) {
+                    Update_user_name(e, user_name?.user_name_exist?._id);
+                  }
+                }}
+                className="sm:w-40 w-full py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+              >
+                {userNameLoading ? (
+                  <LiaSpinnerSolid className="mx-auto animate-spin" />
+                ) :isFreeUser 
+                ? (
+                  "Create"
+                ) : (
+                  "Update"
+                )}
+                
+              </button>
+            </div>
+          )}
 
           {/* IMAGE */}
           <div className="relative h-32 border border-dashed rounded-xl flex items-center justify-center hover:bg-gray-700/30 transition ">
@@ -401,20 +449,37 @@ setUserNameLoading(true);
         <div>
           <label className="block mb-2 text-sm">Bio</label>
           {isFreeUser ? (
-  <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900">
-    <p>🚀 Bio is a Pro feature</p>
-    <Link to="/Dashboard/Billing">
-      <TbMoodEdit className="text-xl animate-pulse" />
-    </Link>
-  </div>
-) : (
-  <textarea
-    value={bio}
-    onChange={(e) => setBio(e.target.value)}
-    rows="3"
-    className="w-full px-4 py-2 rounded-lg dark:bg-gray-700"
-  />
-)}
+            <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900">
+              <p>🚀 Bio is a Pro feature</p>
+              <Link to="/Dashboard/Billing">
+                <TbMoodEdit className="text-xl animate-pulse" />
+              </Link>
+            </div>
+          ) : (
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows="3"
+              className="w-full px-4 py-2 rounded-lg dark:bg-gray-700"
+            />
+          )}
+      { plan?.plan && <button
+  type="submit"
+  disabled={bio_loading}
+  className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+  onClick={
+    (e) => bio_create(e, user_bio?.bio?._id)
+
+  }
+>
+  {bio_loading ? (
+    <LiaSpinnerSolid className="mx-auto animate-spin" />
+  ) : user_bio?.bio?._id ? (
+    "Update bio"
+  ) : (
+    "Save bio"
+  )}
+</button>}
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 const express=require('express');
 const routers=express.Router()
 
-const { upload_profile, update_profile, delete_profile, profiles,UserName, UserNameGet, UserNameUpdate, UserNameDelete } = require('../controllers/profile');
+const { upload_profile, update_profile, delete_profile, profiles,UserName, UserNameGet, UserNameUpdate, UserNameDelete, updateBio, createBio, getBio } = require('../controllers/profile');
 const { upload } = require('../config/cloudinary');
 
 
@@ -13,4 +13,7 @@ const { upload } = require('../config/cloudinary');
   routers.get("/user-name-get",UserNameGet)
   routers.put("/user-name-update/:id",UserNameUpdate)
   routers.delete("/user-name-delete/:id",UserNameDelete)
+  routers.post("/user-bio",createBio)
+  routers.put("/user-bio-update/:userId",updateBio)
+  routers.get("/user-bio-get",getBio)
   module.exports={routers}

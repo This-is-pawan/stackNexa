@@ -26,6 +26,12 @@ const UserSchema = new mongoose.Schema({
     enum: ["free", "pro"],
     default: "free",
   },
+bio: {
+type: String,
+maxlength: 2000, 
+trim: true,
+default: "",
+},
 });
 const UserNameModel=mongoose.model("user_name", UserSchema);
 

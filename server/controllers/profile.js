@@ -208,6 +208,116 @@ const UserNameGet=async (req,res) => {
   }
 }
 
+const createBio = async (req, res) => {
+  try {
+    const { bio } = req.body;
+
+    if (!bio || !bio.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Bio is required",
+      });
+    }
+
+    if (bio.length > 2000) {
+      return res.status(400).json({
+        success: false,
+        message: "Bio must be less than 2000 characters",
+      });
+    }
+
+    const profile = await UserNameModel.create({
+      bio: bio.trim(),
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Bio created successfully",
+      bio: profile.bio,
+    });
+  } catch (error) {
+    console.error("CREATE BIO ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create bio",
+    });
+  }
+};
+
+const updateBio = async (req, res) => {
+  try {
+     const {userId} = req.params; 
+    const { bio } = req.body;
+
+    // ✅ validation
+    if (!bio || !bio.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Bio is required",
+      });
+    }
+
+    if (bio.length > 2000) {
+      return res.status(400).json({
+        success: false,
+        message: "Bio must be less than 2000 characters",
+      });
+    }
+
+ 
+    const updatedProfile = await UserNameModel.findByIdAndUpdate(
+      userId, 
+      { bio: bio.trim() },
+      { new: true }
+    );
+
+    if (!updatedProfile) {
+      return res.status(404).json({
+        success: false,
+        message: "Bio not found, create bio first",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Bio updated successfully",
+      bio: updatedProfile.bio,
+    });
+  } catch (error) {
+    console.error("UPDATE BIO ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update bio",
+    });
+  }
+};
+const getBio = async (req, res) => {
+  try {
+    const profile = await UserNameModel
+      .findOne()
+      .sort({ _id: -1 });
+
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: "Bio not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      bio: profile,
+    });
+  } catch (error) {
+    console.error("GET BIO ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get bio",
+    });
+  }
+};
+
+
 module.exports = {
   upload_profile,
   update_profile,
@@ -216,5 +326,8 @@ module.exports = {
   UserName,
   UserNameGet,
   UserNameUpdate,
-  UserNameDelete
+  UserNameDelete,
+  createBio,
+  updateBio,
+  getBio,
 };

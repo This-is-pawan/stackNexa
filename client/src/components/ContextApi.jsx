@@ -210,9 +210,7 @@ const user_name_get = async () => {
   }
 };
 
-useEffect(() => {
-  user_name_get();
-}, []);
+
 
 //  payment-reciept 
 const [plan,setPlan]=useState(null)
@@ -236,11 +234,33 @@ console.log('failed reciept data');
     setPlan_loading(false)
   }
 }
+// 
+const [user_bio, setUser_bio] = useState(null);
+ const [bio_loading, setBio_loading] = useState(true);
+const get_bio = async () => {
+  try {
+    const result = await axios.get(
+      `${import.meta.env.VITE_API_URL}/profile/user-bio-get`,
+      { withCredentials: true }
+    );
+    
+    
+    setUser_bio(result?.data);
+  } catch {
+    toast.error("Failed to access username");
+  }finally{
+    setBio_loading(false)
+
+  }
+};
+
 
 
   useEffect(() => {
     fetchProfiles();
     payment_reciept()
+     user_name_get();
+     get_bio()
   }, []);
   return (
     <AppContext.Provider
@@ -273,7 +293,10 @@ console.log('failed reciept data');
          checkAuth,
          plan,
          plan_loading,
-         payment_reciept
+         payment_reciept,
+         get_bio,
+         bio_loading,
+         user_bio
       }}
     >
       {children}
