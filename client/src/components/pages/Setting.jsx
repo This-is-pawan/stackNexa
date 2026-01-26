@@ -6,7 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const Setting = () => {
-  const { theme, user, setBar, auth ,setAuth,plan} = useAppContext();
+  const { theme, user, setBar,setOpen, auth ,setAuth,plan} = useAppContext();
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [showSecurityCheck, setShowSecurityCheck] = useState(false);
   const [name, setName] = useState("");
@@ -77,7 +77,11 @@ useEffect(() => {
             ? "bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 text-yellow-300"
             : "bg-gradient-to-tr from-black via-gray-900 to-black text-white"
         }`}
-      onClick={() => setBar(false)}
+      onClick={() => {
+        setBar(false)
+        setOpen(false)
+      }
+      }
     >
       <div className="p-6 max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">⚙️ Settings</h1>

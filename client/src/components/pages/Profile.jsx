@@ -218,7 +218,7 @@ const Update_user_name = async (e, userId) => {
   if (name.trim() === currentName) {
     return toast.error("Username is already updated");
   }
-
+setUserNameLoading(true);
   try {
     const result = await axios.put(
       `${import.meta.env.VITE_API_URL}/profile/user-name-update/${userId}`,
@@ -235,6 +235,8 @@ const Update_user_name = async (e, userId) => {
     toast.error(
       error.response?.data?.message || "Username update failed"
     );
+  }finally{
+    setUserNameLoading(false);
   }
 };
   return (
@@ -343,7 +345,7 @@ const Update_user_name = async (e, userId) => {
     />
 
     <button
-      // type="button"
+      type="button"
       disabled={userNameLoading}
       onClick={(e) => {
         if (isFreeUser && !hasUsername) {
