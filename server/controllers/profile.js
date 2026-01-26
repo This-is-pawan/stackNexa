@@ -121,6 +121,81 @@ const UserName = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+// update username
+const UserNameUpdate = async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Username is required",
+    });
+  }
+
+  try {
+    const currentUser = await UserNameModel.findById(id);
+
+    if (!currentUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Username not found",
+      });
+    }
+
+    // ✅ SAME NAME CHECK
+    if (currentUser.name === name.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Username is already updated",
+      });
+    }
+
+    // ✅ DUPLICATE CHECK
+    const existing = await UserNameModel.findOne({ name: name.trim() });
+    if (existing && existing._id.toString() !== id) {
+      return res.status(409).json({
+        success: false,
+        message: "Username already exists",
+      });
+    }
+
+    currentUser.name = name.trim();
+    await currentUser.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Username updated successfully",
+      updatedUser: currentUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+// delete username
+const UserNameDelete = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedUser = await UserNameModel.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.json({ success: false, message: "Username not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Username deleted successfully",
+      deletedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+// get username
 const UserNameGet=async (req,res) => {
  
   try {
@@ -140,4 +215,6 @@ module.exports = {
   profiles,
   UserName,
   UserNameGet,
+  UserNameUpdate,
+  UserNameDelete
 };

@@ -221,13 +221,14 @@ const payment_reciept=async () => {
 setPlan_loading(true);
   try {
     const result=await axios.get(`${import.meta.env.VITE_API_URL}/api/project/payment-reciept`,{ withCredentials: true })
-    
-    
     if(result.data.success){
    setPlan(result?.data?.result)
     }
 else{
- toast.error('recipt fetch ')
+ 
+console.log('failed reciept data');
+
+ 
 }
   } catch (error) {
     toast.error(error)

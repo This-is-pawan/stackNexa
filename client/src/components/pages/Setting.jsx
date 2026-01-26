@@ -6,7 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const Setting = () => {
-  const { theme, user, setBar, auth ,setAuth} = useAppContext();
+  const { theme, user, setBar, auth ,setAuth,plan} = useAppContext();
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [showSecurityCheck, setShowSecurityCheck] = useState(false);
   const [name, setName] = useState("");
@@ -103,7 +103,7 @@ useEffect(() => {
               <p>
                 Current Plan:
                 <span className="ml-2 font-bold text-blue-600">
-                  {user?.plan || "Free"}
+                  {plan?.plan || "Free"}
                 </span>
               </p>
 

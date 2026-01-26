@@ -3,7 +3,7 @@ import { useAppContext } from "../ContextApi";
 import { TbMoodEdit } from "react-icons/tb";
 import { LiaSpinnerSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
-import { FaCrown ,FaSpinner,FaUserTie} from "react-icons/fa";
+import { FaCrown, FaSpinner, FaUserTie } from "react-icons/fa";
 
 import axios from "axios";
 import deafault_user_image from "../../assets/default_user_image.svg";
@@ -11,9 +11,19 @@ import { toast } from "react-toastify";
 
 const Profile = () => {
   const fileInputRef = useRef(null);
-  const {auth, user, theme, profiles, setBar, setOpen, fetchProfiles ,user_name,user_name_get,free_loading,} =useAppContext();
-  
-
+  const {
+    auth,
+    user,
+    theme,
+    profiles,
+    setBar,
+    setOpen,
+    fetchProfiles,
+    user_name,
+    user_name_get,
+    free_loading,
+    plan,
+  } = useAppContext();
 
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
@@ -23,10 +33,9 @@ const Profile = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [userNameLoading, setUserNameLoading] = useState(false);
   const [note, setNote] = useState(true);
-  const [free_user_name, setFree_user_name] = useState(true);
- const [file_size,setFile_size]=useState('')
-  
-  
+  const [free_user_name, setFree_user_name] = useState("free");
+  const [file_size, setFile_size] = useState("");
+
   // const [pro_user_name, setPro_user_name] = useState(true);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -74,7 +83,7 @@ const Profile = () => {
               }
             },
             "image/jpeg",
-            quality
+            quality,
           );
         };
 
@@ -94,7 +103,7 @@ const Profile = () => {
     try {
       const compressed = await compressImage(selected, 3);
       setFile(compressed);
-      setFile_size((compressed.size / 1024 / 1024).toFixed(2))
+      setFile_size((compressed.size / 1024 / 1024).toFixed(2));
     } catch {
       toast.error("Image processing failed");
     }
@@ -136,7 +145,7 @@ const Profile = () => {
       setDeleteLoading(true);
       await axios.delete(
         `${import.meta.env.VITE_API_URL}/profile/delete-profile/${deleteId}`,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       toast.success("Profile deleted");
       fetchProfiles();
@@ -150,48 +159,84 @@ const Profile = () => {
   };
 
   // ---------------- CREATE USER NAME (FIXED) ----------------
-  useEffect(() => {
-  if (user_name?.user_name_exist?.plan) {
-    setFree_user_name(false);
-  }
-}, [user_name]);
-const [startCreateUsername, setStartCreateUsername] = useState(false);
 
-const common_plan = free_user_name;
+  useEffect(() => {
+    if (user_name?.user_name_exist?.plan) {
+      setFree_user_name(common_plan);
+    }
+  }, [user_name]);
+
+  const [startCreateUsername, setStartCreateUsername] = useState(false);
+
+  const common_plan = plan?.plan || free_user_name;
+  
+  
   const create_user_name = async (e) => {
     e.preventDefault();
 
     if (!name.trim()) {
       return toast.error("Username is required");
     }
-  setStartCreateUsername(true);
+    setStartCreateUsername(true);
     try {
       setUserNameLoading(true);
 
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/profile/user-name`,
         { name },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (res.data?.success) {
-  toast.success("Username created successfully");
-  user_name_get();  
-  setFree_user_name(false);
-  fetchProfiles();
-}
- else {
+        toast.success("Username created successfully");
+        user_name_get();
+        setFree_user_name(common_plan);
+        fetchProfiles();
+      } else {
         toast.error(res.data?.message || "Failed to create username");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     } finally {
       setUserNameLoading(false);
-     
     }
   };
+  //user_name
+  const isFreeUser = common_plan === "free";
+const hasUsername = !!user_name?.user_name_exist?.name;
+const Update_user_name = async (e, userId) => {
+  e.preventDefault();
 
+  const currentName = user_name?.user_name_exist?.name;
 
+  // ✅ FRONTEND VALIDATION
+  if (!name || !name.trim()) {
+    return toast.error("Username is required");
+  }
+
+  // ✅ SAME NAME CHECK (UX)
+  if (name.trim() === currentName) {
+    return toast.error("Username is already updated");
+  }
+
+  try {
+    const result = await axios.put(
+      `${import.meta.env.VITE_API_URL}/profile/user-name-update/${userId}`,
+      { name: name.trim() },
+      { withCredentials: true }
+    );
+
+    if (result.data.success) {
+      toast.success("Username updated successfully");
+      user_name_get();
+      fetchProfiles();
+    }
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message || "Username update failed"
+    );
+  }
+};
   return (
     <div
       className={`min-h-screen p-4 sm:p-6 relative ${
@@ -234,31 +279,32 @@ const common_plan = free_user_name;
 
           <div className=" text-center sm:text-left ">
             <h2 className="text-lg font-semibold">{user?.email}</h2>
-          <article className="text-sm text-gray-400">
-  <p className="w-full flex items-center">
-    <FaUserTie
-      className={`w-6 h-6 rounded-full p-1 border border-gray-700 ${
-        theme === "dark" ? "text-blue-500" : "text-green-200"
-      }`}
-    />
-    <span
-      className={`text-sm capitalize font-semibold pl-1 ${
-        theme === "dark" ? "text-blue-500" : "text-green-200"
-      }`}
-    >
-      {startCreateUsername && free_loading 
-        ? <FaSpinner className="mx-auto animate-spin" />
-        : user_name?.user_name_exist?.name || "user"}
-    </span>
-  </p>
+            <article className="text-sm text-gray-400">
+              <p className="w-full flex items-center">
+                <FaUserTie
+                  className={`w-6 h-6 rounded-full p-1 border border-gray-700 ${
+                    theme === "dark" ? "text-blue-500" : "text-green-200"
+                  }`}
+                />
+                <span
+                  className={`text-sm capitalize font-semibold pl-1 ${
+                    theme === "dark" ? "text-blue-500" : "text-green-200"
+                  }`}
+                >
+                  {startCreateUsername && free_loading ? (
+                    <FaSpinner className="mx-auto animate-spin" />
+                  ) : (
+                    user_name?.user_name_exist?.name || "user"
+                  )}
+                </span>
+              </p>
 
-  {user_name?.user_name_exist?.plan && (
-    <span className="p-1">
-      Plan: {user_name.user_name_exist.plan}
-    </span>
-  )}
-</article>
-
+              {user_name?.user_name_exist?.plan && (
+                <span className="p-1">
+                  Plan: {plan?.plan || user_name.user_name_exist.plan}
+                </span>
+              )}
+            </article>
 
             {isProfileExists && (
               <button
@@ -279,41 +325,59 @@ const common_plan = free_user_name;
           onSubmit={submitProfile}
           className="space-y-4 border border-gray-700 p-4 rounded-xl"
         >
-         {common_plan &&    <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Create username"
-              className="flex-1 px-4 py-2 rounded-lg dark:bg-gray-700 outline-none capitalize"
-            />
-              <button
-                onClick={create_user_name}
-                disabled={userNameLoading}
-                className="sm:w-40 w-full py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-              >
-                {userNameLoading ? (
-                  <LiaSpinnerSolid className="mx-auto animate-spin" />
-                ) :free_user_name ? "Create New":'Update'
-                }
-              </button>
-          </div>
-            }
+{
+
+(
+ 
+  (isFreeUser && !hasUsername) || !isFreeUser
+) && (
+  <div className="flex flex-col sm:flex-row gap-3">
+    <input
+      type="text"
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      placeholder={
+        isFreeUser ? "Create username" : "Update username"
+      }
+      className="flex-1 px-4 py-2 rounded-lg dark:bg-gray-700 outline-none capitalize"
+    />
+
+    <button
+      // type="button"
+      disabled={userNameLoading}
+      onClick={(e) => {
+        if (isFreeUser && !hasUsername) {
+          create_user_name(e); 
+        } else if (!isFreeUser) {
+          Update_user_name(e, user_name?.user_name_exist?._id); 
+        }
+      }}
+      className="sm:w-40 w-full py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+    >
+      {userNameLoading ? (
+        <LiaSpinnerSolid className="mx-auto animate-spin" />
+      ) : isFreeUser ? (
+        "Create"
+      ) : (
+        "Update"
+      )}
+    </button>
+  </div>
+)}
 
           {/* IMAGE */}
           <div className="relative h-32 border border-dashed rounded-xl flex items-center justify-center hover:bg-gray-700/30 transition ">
-
             <input
               type="file"
               accept="image/png,image/jpeg"
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={handleFileChange}
             />
-           
+
             <p className="text-sm text-blue-700">
               {file ? file.name : "Choose profile image"}
             </p>
-             <p className="text-sm text-blue-400 absolute top-1 capitalize ">{`Automatically resizes file size: ${file_size}MB`}</p>
+            <p className="text-sm text-blue-400 absolute top-1 capitalize ">{`Automatically resizes file size: ${file_size}MB`}</p>
           </div>
 
           <button
@@ -334,21 +398,21 @@ const common_plan = free_user_name;
         {/* BIO */}
         <div>
           <label className="block mb-2 text-sm">Bio</label>
-          {user?.plan === "pro" ? (
-            <textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              rows="3"
-              className="w-full px-4 py-2 rounded-lg dark:bg-gray-700"
-            />
-          ) : (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900">
-              <p>🚀 Bio is a Pro feature</p>
-              <Link to="/Dashboard/Billing">
-                <TbMoodEdit className="text-xl animate-pulse" />
-              </Link>
-            </div>
-          )}
+          {isFreeUser ? (
+  <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900">
+    <p>🚀 Bio is a Pro feature</p>
+    <Link to="/Dashboard/Billing">
+      <TbMoodEdit className="text-xl animate-pulse" />
+    </Link>
+  </div>
+) : (
+  <textarea
+    value={bio}
+    onChange={(e) => setBio(e.target.value)}
+    rows="3"
+    className="w-full px-4 py-2 rounded-lg dark:bg-gray-700"
+  />
+)}
         </div>
       </div>
 
