@@ -176,7 +176,7 @@ const ProfileUpdate = () => {
               accept="image/png,image/jpeg"
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={handleImageChange}
-              required
+             
             />
             <p className="text-sm text-blue-400 font-medium">
               Choose profile image (Max 5MB)
@@ -196,7 +196,7 @@ const ProfileUpdate = () => {
               onChange={(e) => setName(e.target.value)}
               placeholder="Username"
               className="w-full px-4 py-3 rounded-xl bg-gray-800 outline-none capitalize"
-              required
+            
             />
 
             <input
@@ -219,16 +219,16 @@ const ProfileUpdate = () => {
           <h3 className="font-semibold">Professional Details</h3>
 
           <input required value={profession} onChange={(e) => setProfession(e.target.value)} placeholder="Profession" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input required value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input required value={education} onChange={(e) => setEducation(e.target.value)} placeholder="Education" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input required value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Skills" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input required value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="Website" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input required value={github} onChange={(e) => setGithub(e.target.value)} placeholder="GitHub" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input required value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="LinkedIn" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+          <input  value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+          <input  value={education} onChange={(e) => setEducation(e.target.value)} placeholder="Education" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+          <input value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Skills" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+          <input  value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="Website" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+          <input  value={github} onChange={(e) => setGithub(e.target.value)} placeholder="GitHub" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+          <input  value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="LinkedIn" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
 
           {plan && (
             <textarea
-              required
+         
               rows="4"
               value={bio}
               onChange={(e) => setBio(e.target.value)}

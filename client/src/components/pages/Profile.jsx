@@ -117,7 +117,7 @@ const Profile = () => {
         {/* ================= BIO ================= */}
         {plan?.plan &&
         <div>
-          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-wrap">
             📝 Bio
           </h3>
 
