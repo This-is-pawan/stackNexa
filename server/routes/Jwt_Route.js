@@ -19,11 +19,11 @@ router.post("/logout", Logout);
 router.get("/authenticated", Verify, isAuthenticated);
 router.get("/allusers",Verify, AllUsers);
 router.post("/verify-otp", verifyLoginOtp);
-router.post('/create-order',createOrder)
-router.post('/verify-payment',verifyPayment)
-router.get('/payment-success',paymentSuccess)
-router.get('/payment-success',paymentSuccess)
-router.get('/payment-reciept',payment_receipt)
+router.post('/create-order',Verify,createOrder)
+router.post('/verify-payment',Verify,verifyPayment)
+router.get('/payment-success',Verify,paymentSuccess)
+router.get('/payment-success',Verify,paymentSuccess)
+router.get('/payment-reciept',Verify,payment_receipt)
 
 router.put('/user/change-password',Verify,change_password)
 

@@ -30,6 +30,7 @@ const createOrder = async (req, res) => {
 
 // ===== Verify Payment =====
 const verifyPayment = async (req, res) => {
+  const userId = req.user.userId;
   const {
     razorpay_order_id,
     razorpay_payment_id,
@@ -60,6 +61,7 @@ message: "Amount and plan are required",
 
   if (expectedSignature === razorpay_signature) {
     const payment = await Payments.create({
+      userId,
       paymentId: razorpay_payment_id,
       orderId: razorpay_order_id || "temp_" + Date.now(),
       signature: razorpay_signature,
@@ -88,7 +90,7 @@ const paymentSuccess = async (req, res) => {
   res.json({ success: true, message: "Payment success", paymentId });
 };
 const payment_receipt = async (req, res) => {
-  userId = req.user;
+ const userId = req.user.userId;
   try {
     const result = await Payments.findOne({userId })
       .sort({ createdAt: -1 }); 

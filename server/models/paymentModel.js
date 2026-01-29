@@ -1,9 +1,15 @@
 const mongoose = require("mongoose");
 
 const paymentSchema = new mongoose.Schema(
-  {
+  { user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Jwt_Authentication",
+        required: true,
+        unique: true,
+        index: true
+      },
    paymentId: { type: String, required: true },
-orderId: { type: String, required: true, unique: true },
+    orderId: { type: String, required: true, unique: true },
     signature: { type: String, required: true },
     amount: { type: Number, required: true },
     status: { type: String, enum: ["Success", "Failed"], default: "Success" },
