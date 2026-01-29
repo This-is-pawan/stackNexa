@@ -26,6 +26,7 @@ import Ecommerce from "./components/pages/Ecommerce";
 import SassDashboard from "./components/pages/SaasDashboard";
 import BusinessApp from "./components/pages/BusinessApp";
 import Profile from "./components/pages/Profile";
+import ProfileUpdate from './components/pages/ProfileUpdate'
 import Password from "./components/pages/Password";
 import Setting from "./components/pages/Setting";
 import Help from "./components/pages/Help";
@@ -89,6 +90,7 @@ const App = () => {
 
             <Route path="setting" element={<Setting />}>
               <Route path="profile" element={<Profile />} />
+              <Route path="profile-update" element={<ProfileUpdate />} />
               <Route path="change-password" element={<Password />} />
             </Route>
 

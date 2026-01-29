@@ -7,13 +7,14 @@ import { LuSunMoon } from "react-icons/lu";
 import { TiWeatherSunny } from "react-icons/ti";
 import { FaBarsStaggered } from "react-icons/fa6";
 import stackNexaLogo from "../assets/stackNexaLogo.png"; 
-import deafault_user_image from '../assets/default_user_image.svg'
+import default_user_image from '../assets/default_user_image.svg'
 import { TbLogout2 } from "react-icons/tb";
 import { IoNotificationsCircleSharp } from "react-icons/io5";
 import { useAppContext } from "./ContextApi";
 import NavLinks from "./pages/NavLinks";
-import profileImage from '../assets/cloud.svg'
+
 import { FaSpinner } from "react-icons/fa";
+import Profile from "./pages/Profile";
 const Navbar = () => {
   const {
     theme,
@@ -27,21 +28,17 @@ const Navbar = () => {
     Googleuser,
     setGoogleUser,
     setVeified,
-    profiles,user_name,
-    free_loading
+    profiles,
   } = useAppContext();
-
+const profileImage = profiles?.image?.image?.url || default_user_image;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const isLoggedIn = auth?.isAuthenticated || Googleuser?.isAuthenticated;
   const currentUser = auth?.user || Googleuser?.user;
- const profile_image =
-  profiles && profiles.length > 0
-    ? profiles[0]?.image?.url
-    : deafault_user_image;
+ 
 
-const [startCreateUsername, setStartCreateUsername] = useState(false);
+// const [startCreateUsername, setStartCreateUsername] = useState(false);
   /* ================= LOGOUT ================= */
   const logout = async () => {
     try {
@@ -137,7 +134,7 @@ const [startCreateUsername, setStartCreateUsername] = useState(false);
                 <div className="p-3 border-b text-center ">
                   <div className="flex justify-center">
               <img
-  src={profile_image }
+  src={profileImage }
   alt="profile_image"
   className="w-10 h-10 rounded-full border border-black 
              transition-transform duration-300 
@@ -147,10 +144,11 @@ const [startCreateUsername, setStartCreateUsername] = useState(false);
                   
                     </div>
                   <p className="font-semibold text-black capitalize">
+                 
                     
-                     {startCreateUsername && free_loading 
+                     {loading
                             ? <FaSpinner className="mx-auto animate-spin" />
-                            : user_name?.user_name_exist?.name || currentUser?.name}
+                            :profiles?.image?.image?.name|| currentUser?.name}
                   </p>
                   <p className="text-xs text-gray-600 truncate">
                     {currentUser?.email}

@@ -6,7 +6,7 @@ const {
   isAuthenticated,
   verifyLoginOtp,
   GoogleAllUsers,
-  delete_user_permanently,
+  change_password,
 } = require("../controllers/Jwt_Auth_controller");
 const  Verify  = require("../middleware/Jwtmiddleware");
 const { AllUsers } = require("../controllers/UsersData");
@@ -24,6 +24,7 @@ router.post('/verify-payment',verifyPayment)
 router.get('/payment-success',paymentSuccess)
 router.get('/payment-success',paymentSuccess)
 router.get('/payment-reciept',payment_receipt)
-router.delete("/delete-user-account/:userId",delete_user_permanently)
+
+router.put('/user/change-password',Verify,change_password)
 
 module.exports = { router };

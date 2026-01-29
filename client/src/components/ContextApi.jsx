@@ -12,9 +12,7 @@ const ContextApi = ({ children }) => {
   const navigate = useNavigate();
 
   /* ================= THEME ================= */
-  const [theme, setTheme] = useState(
-    localStorage.getItem("theme") || "light"
-  );
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
   const handleDarkMode = () => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
@@ -35,7 +33,7 @@ const ContextApi = ({ children }) => {
   const checkAuth = async () => {
     try {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/project/authenticated`
+        `${import.meta.env.VITE_API_URL}/api/project/authenticated`,
       );
 
       if (data?.success) {
@@ -59,13 +57,13 @@ const ContextApi = ({ children }) => {
   /* ================= UI ================= */
   const [bar, setBar] = useState(false);
   const [open, setOpen] = useState(false);
-const [deleteId, setDeleteId] = useState(null);
- const [deleteLoading, setDeleteLoading] = useState(false);
- const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   /* ================= OTP ================= */
   const [loading, setLoading] = useState(false);
   const [otpExpire_time, setOtpExpire_time] = useState(() =>
-    localStorage.getItem("otpExpireTime")
+    localStorage.getItem("otpExpireTime"),
   );
 
   useEffect(() => {
@@ -73,24 +71,24 @@ const [deleteId, setDeleteId] = useState(null);
       localStorage.setItem("otpExpireTime", otpExpire_time);
     }
   }, [otpExpire_time]);
-const [verified, setVeified] = useState(() => {
-  return localStorage.getItem("verified") === "true";
-});
+  const [verified, setVeified] = useState(() => {
+    return localStorage.getItem("verified") === "true";
+  });
 
   const Handle_verified = async (otp) => {
     try {
       setLoading(true);
       const { data } = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/project/verify-otp`,
-        { otp }
+        { otp },
       );
 
       if (data?.success) {
         toast.success("OTP verified successfully, please login");
-        localStorage.setItem("verified", "true"); 
+        localStorage.setItem("verified", "true");
         localStorage.removeItem("otpExpireTime");
         setOtpExpire_time(null);
-        setVeified(true)
+        setVeified(true);
         navigate("/login");
       } else {
         toast.error(data?.message || "Verification failed");
@@ -100,27 +98,26 @@ const [verified, setVeified] = useState(() => {
     } finally {
       setLoading(false);
     }
-  }; 
- 
+  };
+
   /* ================= JWT USERS ================= */
-  const [registerUsers, setRegisterUsers] = useState([]); 
+  const [registerUsers, setRegisterUsers] = useState([]);
 
   const fetchUsers = async () => {
     try {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/project/allusers`
+        `${import.meta.env.VITE_API_URL}/api/project/allusers`,
       );
 
       if (data?.success) {
         setRegisterUsers(data.users || []);
-      }  
+      }
     } catch (error) {
       console.error("Fetch users error:", error);
       setRegisterUsers([]);
     }
   };
 
-  
   useEffect(() => {
     if (auth.isAuthenticated) {
       fetchUsers();
@@ -137,14 +134,14 @@ const [verified, setVeified] = useState(() => {
   const googleAllUser = async () => {
     try {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/project/google-all-users`
+        `${import.meta.env.VITE_API_URL}/api/project/google-all-users`,
       );
 
       if (data?.success) {
         setRegisterUsers(data.users || []);
       }
     } catch (error) {
-      console.log(error.message||'google auth fail');
+      console.log(error.message || "google auth fail");
     }
   };
 
@@ -152,7 +149,7 @@ const [verified, setVeified] = useState(() => {
     const getGoogleUser = async () => {
       try {
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/auth/user`
+          `${import.meta.env.VITE_API_URL}/api/auth/user`,
         );
 
         if (data?.success) {
@@ -180,88 +177,57 @@ const [verified, setVeified] = useState(() => {
     getGoogleUser();
     googleAllUser();
   }, []);
-// profile
-   const [profiles, setProfiles] = useState([]);
-const fetchProfiles = async () => {
+
+  // ########
+  const [plan, setPlan] = useState(null);
+  const [plan_loading, setPlan_loading] = useState(true);
+  const payment_reciept = async () => {
+    setPlan_loading(true);
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/profile/profiles`);
-      setProfiles(res?.data?.data);
-      setDeleteId(res?.data?.data?.[0]?._id)
+      const result = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/project/payment-reciept`,
+        { withCredentials: true },
+      );
+      if (result.data.success) {
+        setPlan(result?.data?.result);
+      } else {
+        console.log("failed reciept data");
+      }
+    } catch (error) {
+      toast.error(error);
+    } finally {
+      setPlan_loading(false);
+    }
+  };
+  //
+
+  /* ================= PROFILE ================= */
+  const [profiles, setProfiles] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  // FETCH PROFILE (IMAGE)
+  const fetchProfiles = async () => {
+    try {
+      setProfileLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/project/profiles`,
+        { withCredentials: true },
+      );
+      setProfiles(res?.data);
+      
     } catch (err) {
-      console.error("Fetch error", err);
+      console.error("Profile fetch error", err);
+    } finally {
+      setProfileLoading(false);
     }
   };
 
-// user-name-get
-const [user_name, setUser_name] = useState(null);
- const [free_loading, setFree_loading] = useState(true);
-const user_name_get = async () => {
-  try {
-    const result = await axios.get(
-      `${import.meta.env.VITE_API_URL}/profile/user-name-get`,
-      { withCredentials: true }
-    );
-    setUser_name(result?.data);
-  } catch {
-    toast.error("Failed to access username");
-  }finally{
-    setFree_loading(false)
-
-  }
-};
-
-
-
-//  payment-reciept 
-const [plan,setPlan]=useState(null)
-const [plan_loading,setPlan_loading]=useState(true)
-const payment_reciept=async () => {
-setPlan_loading(true);
-  try {
-    const result=await axios.get(`${import.meta.env.VITE_API_URL}/api/project/payment-reciept`,{ withCredentials: true })
-    if(result.data.success){
-   setPlan(result?.data?.result)
-    }
-else{
- 
-console.log('failed reciept data');
-
- 
-}
-  } catch (error) {
-    toast.error(error)
-  }finally{
-    setPlan_loading(false)
-  }
-}
-// 
-const [user_bio, setUser_bio] = useState(null);
- const [bio_loading, setBio_loading] = useState(true);
-const get_bio = async () => {
-  try {
-    const result = await axios.get(
-      `${import.meta.env.VITE_API_URL}/profile/user-bio-get`,
-      { withCredentials: true }
-    );
-    
-    
-    setUser_bio(result?.data);
-  } catch {
-    toast.error("Failed to access username");
-  }finally{
-    setBio_loading(false)
-
-  }
-};
-
-
-
+  /* ================= INIT ================= */
   useEffect(() => {
     fetchProfiles();
-    payment_reciept()
-     user_name_get();
-     get_bio()
+    payment_reciept();
   }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -284,19 +250,13 @@ const get_bio = async () => {
         setGoogleUser,
         verified,
         setVeified,
-        profiles, 
-        setProfiles,
+        checkAuth,
+        plan,
+        plan_loading,
+        payment_reciept,
         fetchProfiles,
-        user_name ,
-        user_name_get,
-        free_loading,
-         checkAuth,
-         plan,
-         plan_loading,
-         payment_reciept,
-         get_bio,
-         bio_loading,
-         user_bio
+        profileLoading,
+        profiles,
       }}
     >
       {children}

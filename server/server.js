@@ -8,7 +8,8 @@ const passport = require("passport");
 const MongoStore=require('connect-mongo').default;
 const connection = require("./config/DBFile");
 const { router } = require("./routes/Jwt_Route");
-const {routers}=require('./routes/profile_route')
+const profileRoutes = require("./routes/profile_route");
+
 require("./config/GoogleAuth");
 const app = express();
 connection();
@@ -93,7 +94,7 @@ app.get("/logout", (req, res) => {
 
 // API routes
 app.use("/api/project", router);
-app.use('/profile',routers)
+app.use('/api/project',profileRoutes)
 app.get("/", (req, res) => {
   res.json({ success: true, message: "Home route is run successfully" });
 });

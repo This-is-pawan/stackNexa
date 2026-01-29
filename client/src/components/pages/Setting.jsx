@@ -24,14 +24,12 @@ useEffect(() => {
 }, [auth]);
 
 
-  const delete_user_permanently = async (userId) => {
-    if (!userId) return;
-
+  const delete_user_permanently = async () => {
     try {
       setDangerLoading(true);
 
       await axios.delete(
-        `${import.meta.env.VITE_API_URL}/api/project/delete-user-account/${userId}`,
+        `${import.meta.env.VITE_API_URL}/api/project/profile/delete-account`,
         { withCredentials: true }
       );
 
@@ -89,8 +87,10 @@ useEffect(() => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1 bg-white dark:bg-gray-800 rounded-xl p-5 shadow">
             <h2 className="text-xl font-semibold mb-3">Account</h2>
-
-            <Link to="profile" className="block py-2 hover:underline">
+<Link to="profile" className="block py-2 hover:underline">
+              Profile
+            </Link>
+            <Link to="profile-update" className="block py-2 hover:underline">
               Edit Profile
             </Link>
 
@@ -233,7 +233,7 @@ useEffect(() => {
 
              <button
   disabled={danger_loading || !isExactUserIdMatch}
-  onClick={() => delete_user_permanently(dangerUserId)}
+  onClick={() => delete_user_permanently()}
   className={`px-4 py-2 rounded-lg flex gap-2 text-white
     ${
       danger_loading || !isExactUserIdMatch

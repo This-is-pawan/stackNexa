@@ -195,21 +195,36 @@ const Logout = async (req, res) => {
   }
 };
 
-const isAuthenticated = (req, res) => {
-  const userAuth = req.user;
+const isAuthenticated = async (req, res) => {
+  const id=req.user.userId
   try {
+    const user = await JWTUser
+      .findById(id)
+      
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        isAuthenticated: false,
+        message: "User not found",
+      });
+    }
+
     return res.status(200).json({
       success: true,
       isAuthenticated: true,
-      user: userAuth,
+      user,
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
+      isAuthenticated: false,
       message: error.message,
     });
   }
 };
+
+
 const GoogleAllUsers = async (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({
@@ -237,35 +252,62 @@ const GoogleAllUsers = async (req, res) => {
   }
 };
 
-const delete_user_permanently = async (req, res) => {
+const change_password = async (req, res) => {
+  const { password, new_password, confirm_password } = req.body;
+
+
+  if (!password || !new_password || !confirm_password) {
+    return res.status(400).json({
+      success: false,
+      message: "All fields are required",
+    });
+  }
+
+ 
+  if (new_password !== confirm_password) {
+    return res.status(400).json({
+      success: false,
+      message: "New password and confirm password do not match",
+    });
+  }
+
   try {
-    const { userId } = req.params; 
-    console.log("Received userId:", userId);
-    if (!userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User ID is required" });
+    
+    const user = await JWTUser.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    const deletedUser = await JWTUser.findByIdAndDelete(userId);
+ 
+    const isMatch = await bcryptjs.compare(password, user.password);
 
-    if (!deletedUser) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Current password is incorrect",
+      });
     }
+    const hashedPassword = await bcryptjs.hash(new_password, 10);
+    user.password = hashedPassword;
+    await user.save();
 
     return res.status(200).json({
       success: true,
-      message: "User deleted permanently",
+      message: "Password changed successfully",
     });
 
   } catch (error) {
-    console.error("DELETE USER ERROR:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Delete failed" });
+    console.error("CHANGE PASSWORD ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
   }
 };
 
-module.exports = { Register, Login, Logout, isAuthenticated, verifyLoginOtp,GoogleAllUsers,delete_user_permanently };
+
+module.exports = { Register, Login, Logout, isAuthenticated, verifyLoginOtp,GoogleAllUsers,change_password };

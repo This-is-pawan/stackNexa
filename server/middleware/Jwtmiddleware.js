@@ -23,7 +23,10 @@ const Verify = async (req, res, next) => {
       });
     }
 
-    req.user = user;
+    // req.user = user;
+    req.user = {
+userId: decoded.userId,
+};
     next();
   } catch (error) {
     return res.status(401).json({

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "./ContextApi";
-
+import { LiaSpinnerSolid } from "react-icons/lia";
 const UserVerified = () => {
   const { auth, Handle_verified, theme, loading,otpExpire_time, } = useAppContext();
     const OTP_LENGTH = 4;
@@ -84,7 +84,7 @@ const formatTime = (seconds) => {
           onClick={() => Handle_verified(otp.join(""))}
           className="w-full py-2 bg-orange-500 rounded disabled:bg-gray-500"
         >
-          {loading ? "Verifying..." : "Verify OTP"}
+          {loading ? <LiaSpinnerSolid className="animate-spin mx-auto"/> : "Verify OTP"}
         </button>
       </div>
     </div>

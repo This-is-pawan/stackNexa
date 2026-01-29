@@ -1,19 +1,39 @@
-const express=require('express');
-const routers=express.Router()
+const express = require("express");
+const router = express.Router();
 
-const { upload_profile, update_profile, delete_profile, profiles,UserName, UserNameGet, UserNameUpdate, UserNameDelete, updateBio, createBio, getBio } = require('../controllers/profile');
-const { upload } = require('../config/cloudinary');
+const {
+  createBasicProfile,
+  createProfessionalProfile,
+  deleteBasicProfile,
+  deleteProfessionalProfile,
+  getFullProfile,
+  deleteAccount,
+} = require("../controllers/profile");
 
+const Verify = require("../middleware/Jwtmiddleware");
+const { upload } = require("../config/cloudinary");
 
-  routers.post("/upload-profile",upload.single("profile"),upload_profile);
-  routers.put("/update-profile/:id", upload.single("profile"),update_profile)
-  routers.delete("/delete-profile/:id",delete_profile)
-  routers.get("/profiles",profiles)
-  routers.post("/user-name",UserName)
-  routers.get("/user-name-get",UserNameGet)
-  routers.put("/user-name-update/:id",UserNameUpdate)
-  routers.delete("/user-name-delete/:id",UserNameDelete)
-  routers.post("/user-bio",createBio)
-  routers.put("/user-bio-update/:userId",updateBio)
-  routers.get("/user-bio-get",getBio)
-  module.exports={routers}
+/* ================= BASIC PROFILE ================= */
+/* image + location + username (ONE CLICK) */
+router.post(
+  "/profile/basic",
+  Verify,
+  upload.single("profile"),
+  createBasicProfile
+);
+
+router.delete("/profile/basic", Verify, deleteBasicProfile);
+
+/* ================= PROFESSIONAL PROFILE ================= */
+/* profession, company, education, skills, links (ONE CLICK) */
+router.post("/profile/professional", Verify, createProfessionalProfile);
+
+router.delete("/profile/delete-professional", Verify, deleteProfessionalProfile);
+
+/* ================= GET FULL PROFILE ================= */
+router.get("/profiles", Verify, getFullProfile);
+
+/* ================= DELETE ACCOUNT ================= */
+router.delete("/profile/delete-account", Verify, deleteAccount);
+
+module.exports = router;

@@ -1,516 +1,184 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
+import {
+  FaUserTie,
+  FaCrown,
+  FaMapMarkerAlt,
+  FaBriefcase,
+  FaGraduationCap,
+  FaTools,
+  FaGithub,
+  FaLinkedin,
+  FaGlobe,
+} from "react-icons/fa";
+import default_user_image from "../../assets/default_user_image.svg";
 import { useAppContext } from "../ContextApi";
-import { TbMoodEdit } from "react-icons/tb";
-import { LiaSpinnerSolid } from "react-icons/lia";
-import { Link } from "react-router-dom";
-import { FaCrown, FaSpinner, FaUserTie } from "react-icons/fa";
-
-import axios from "axios";
-import deafault_user_image from "../../assets/default_user_image.svg";
-import { toast } from "react-toastify";
 
 const Profile = () => {
-  const fileInputRef = useRef(null);
-  const {
-    auth,
-    user,
-    theme,
-    profiles,
-    setBar,
-    setOpen,
-    fetchProfiles,
-    user_name,
-    user_name_get,
-    free_loading,
-    plan,
-    get_bio,
-    user_bio,
-  } = useAppContext();
+  const { theme, profiles, auth,plan } = useAppContext();
+  const website = profiles?.details?.website;
+  const github = profiles?.details?.github;
+  const linkedin = profiles?.details?.linkedin;
+  const bio = profiles?.details?.bio;
+  const Plan= plan?.plan;
+  const education = profiles?.details?.education;
+  const skills = profiles?.details?.skills;
+  const company = profiles?.details?.company;
+  const profession = profiles?.details?.profession;
+  const location = profiles?.image?.image?.location;
 
-  const [name, setName] = useState(user?.name || "");
-  const [bio, setBio] = useState(user?.bio || "");
-  const [file, setFile] = useState(null);
+  const user_email = auth?.user?.email;
+  const user_name = profiles?.image?.image?.name;
+  const profileImage = profiles?.image?.image?.url || default_user_image;
 
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [userNameLoading, setUserNameLoading] = useState(false);
-  const [note, setNote] = useState(true);
-  const [free_user_name, setFree_user_name] = useState("free");
-  const [file_size, setFile_size] = useState("");
+  const pageBg =
+    theme === "dark"
+      ? "bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 text-yellow-300"
+      : "bg-gradient-to-tr from-black via-gray-900 to-black text-white";
 
-  // const [pro_user_name, setPro_user_name] = useState(true);
+  const cardBg =
+    theme === "dark"
+      ? "bg-gray-900 border border-gray-700"
+      : "bg-gray-950 border border-gray-800";
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
+  const sectionBg =
+    theme === "dark" ? "bg-gray-800 text-yellow-200" : "bg-black text-gray-200";
 
-  const profileImage =
-    profiles?.length > 0 ? profiles[0]?.image?.url : deafault_user_image;
-
-  const isProfileExists = profiles?.length > 0;
-  const profileId = profiles?.[0]?._id;
-
-  // ---------------- IMAGE COMPRESS ----------------
-  const compressImage = (file, maxSizeMB = 3) =>
-    new Promise((resolve, reject) => {
-      const img = new Image();
-      const reader = new FileReader();
-
-      reader.readAsDataURL(file);
-      reader.onload = () => (img.src = reader.result);
-      reader.onerror = reject;
-
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        const MAX_WIDTH = 1200;
-        const scale = Math.min(1, MAX_WIDTH / img.width);
-
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
-
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        let quality = 0.9;
-
-        const compress = () => {
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) return reject();
-              if (blob.size / 1024 / 1024 <= maxSizeMB || quality <= 0.4) {
-                resolve(new File([blob], file.name, { type: "image/jpeg" }));
-              } else {
-                quality -= 0.1;
-                compress();
-              }
-            },
-            "image/jpeg",
-            quality,
-          );
-        };
-
-        compress();
-      };
-    });
-
-  // ---------------- FILE CHANGE ----------------
-  const handleFileChange = async (e) => {
-    const selected = e.target.files[0];
-    if (!selected) return;
-
-    if (!selected.type.startsWith("image/")) {
-      return toast.error("Only image files allowed");
-    }
-
-    try {
-      const compressed = await compressImage(selected, 3);
-      setFile(compressed);
-      setFile_size((compressed.size / 1024 / 1024).toFixed(2));
-    } catch {
-      toast.error("Image processing failed");
-    }
-  };
-
-  // ---------------- UPLOAD / UPDATE ----------------
-  const submitProfile = async (e) => {
-    e.preventDefault();
-    if (!file) return toast.error("Please select an image");
-
-    const formData = new FormData();
-    formData.append("profile", file);
-
-    try {
-      setSaveLoading(true);
-      const url = isProfileExists
-        ? `/profile/update-profile/${profileId}`
-        : "/profile/upload-profile";
-
-      const method = isProfileExists ? "put" : "post";
-
-      await axios[method](`${import.meta.env.VITE_API_URL}${url}`, formData, {
-        withCredentials: true,
-      });
-
-      toast.success(isProfileExists ? "Profile updated" : "Profile saved");
-      setFile(null);
-      fetchProfiles();
-    } catch {
-      toast.error("Profile action failed");
-    } finally {
-      setSaveLoading(false);
-    }
-  };
-
-  // ---------------- DELETE ----------------
-  const confirmDelete = async () => {
-    try {
-      setDeleteLoading(true);
-      await axios.delete(
-        `${import.meta.env.VITE_API_URL}/profile/delete-profile/${deleteId}`,
-        { withCredentials: true },
-      );
-      toast.success("Profile deleted");
-      fetchProfiles();
-    } catch {
-      toast.error("Delete failed");
-    } finally {
-      setDeleteLoading(false);
-      setShowDeleteConfirm(false);
-      setDeleteId(null);
-    }
-  };
-
-  // ---------------- CREATE USER NAME (FIXED) ----------------
-
-  useEffect(() => {
-    if (user_name?.user_name_exist?.plan) {
-      setFree_user_name(common_plan);
-      setUsernamePending(false);
-    }
-  }, [user_name]);
-
-  const [startCreateUsername, setStartCreateUsername] = useState(false);
-
-  const common_plan = plan?.plan || free_user_name;
-
-  const create_user_name = async (e) => {
-    e.preventDefault();
-
-    if (!name.trim()) {
-      return toast.error("Username is required");
-    }
-    setStartCreateUsername(true);
-    try {
-      setUserNameLoading(true);
-
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/profile/user-name`,
-        { name },
-        { withCredentials: true },
-      );
-
-      if (res.data?.success) {
-        toast.success("Username created successfully");
-        user_name_get();
-        setFree_user_name(common_plan);
-        fetchProfiles();
-      } else {
-        toast.error(res.data?.message || "Failed to create username");
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    } finally {
-      setUserNameLoading(false);
-    }
-  };
-  //user_name
-  const isFreeUser = common_plan === "free";
-  const hasUsername = !!user_name?.user_name_exist?.name;
-  const [usernamePending, setUsernamePending] = useState(false);
-  const Update_user_name = async (e, userId) => {
-    e.preventDefault();
-
-    const currentName = user_name?.user_name_exist?.name;
-
-    // ✅ FRONTEND VALIDATION
-    if (!name || !name.trim()) {
-      return toast.error("Username is required");
-    }
-
-    // ✅ SAME NAME CHECK (UX)
-    if (name.trim() === currentName) {
-      return toast.error("Username is already updated");
-    }
-    try {
-      setUserNameLoading(true);
-      setUsernamePending(true);
-
-      const result = await axios.put(
-        `${import.meta.env.VITE_API_URL}/profile/user-name-update/${userId}`,
-        { name: name.trim() },
-        { withCredentials: true },
-      );
-
-      if (result.data.success) {
-        toast.success("Username updated successfully");
-        await user_name_get();
-        fetchProfiles();
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Username update failed");
-    } finally {
-      setUserNameLoading(false);
-    }
-  };
-  // bio create and update
- const [bio_loading,setBio_loading]=useState(false)
-  const bio_create = async (e, userId) => {
-  e.preventDefault();
-
-  try {
-    setBio_loading(true);
-
-    const isCreate = !user_bio?.bio?._id;
-
-    const url = isCreate
-      ? "/profile/user-bio"
-      : `/profile/user-bio-update/${userId}`;
-
-    const method = isCreate ? "post" : "put";
-
-    await axios[method](
-      `${import.meta.env.VITE_API_URL}${url}`,
-      { bio },
-      { withCredentials: true }
-    );
-
-    toast.success(isCreate ? "Bio saved" : "Bio updated");
-    setBio("")
-    get_bio()
-  } catch (error) {
-    toast.error(error?.response?.data?.message || "Something went wrong");
-  } finally {
-    setBio_loading(false);
-  }
-};
   return (
-    <div
-      className={`min-h-screen p-4 sm:p-6 relative ${
-        theme === "dark"
-          ? "bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 text-yellow-300"
-          : "bg-gradient-to-tr from-black via-gray-900 to-black text-white"
-      }`}
-      onClick={() => {
-        setBar(false);
-        // setOpen(false);
-      }}
-    >
-      {/* NOTE */}
-      {note && (
-        <div className="mx-auto w-[92%] sm:w-[80%] md:w-[60%] lg:w-[45%] flex items-start gap-2 text-[10px] sm:text-[11px] text-amber-400 font-medium tracking-wide bg-amber-400/10 px-3 py-2 rounded-2xl border border-amber-400/30 scale-75 hover:scale-100 transition duration-150 absolute top-[-2rem] left-0 right-0">
-          <FaCrown className="text-lg sm:text-xl shrink-0 mt-[2px]" />
-          <span className="flex-1">
-            Pro users can create and update their username & bio. Free users can
-            create a username only once.
-          </span>
-          <button
-            onClick={() => setNote(false)}
-            className="w-5 h-5 text-[10px] rounded-full bg-green-700 text-white flex items-center justify-center hover:scale-105 transition"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+    <div className={`min-h-screen p-2 sm:p-6 ${pageBg}`}>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">
+        👤 My Profile
+      </h1>
 
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6">👤 Profile</h1>
-
-      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-2xl shadow-lg space-y-6 relative">
-        {/* HEADER */}
-        <div className="flex flex-col sm:flex-row items-center gap-4">
+      <div
+        className={`max-w-4xl mx-auto rounded-2xl shadow-xl p-5 sm:p-6 space-y-6 ${cardBg}`}
+      >
+        {/* ================= HEADER ================= */}
+        <div className="flex flex-col sm:flex-row items-center gap-6">
           <img
             src={profileImage}
             alt="profile"
-            className="w-24 h-24 rounded-full border object-cover hover:scale-105 transition"
+            className="w-28 h-28 rounded-full object-cover border-4 border-gray-600 shadow-md"
           />
 
-          <div className=" text-center sm:text-left ">
-            <h2 className="text-lg font-semibold">{user?.email}</h2>
-            <article className="text-sm text-gray-400">
-              <p className="w-full flex items-center">
-                <FaUserTie
-                  className={`w-6 h-6 rounded-full p-1 border border-gray-700 ${
-                    theme === "dark" ? "text-blue-500" : "text-green-200"
-                  }`}
-                />
-                <span
-                  className={`text-sm capitalize font-semibold pl-1 ${
-                    theme === "dark" ? "text-blue-500" : "text-green-200"
-                  }`}
-                >
-                  {
-                  userNameLoading ||
-                  usernamePending ||
-                  startCreateUsername ? (
-                    <FaSpinner className="mx-auto animate-spin" />
-                  ) : (
-                    user_name?.user_name_exist?.name || "user"
-                  )}
-                </span>
-              </p>
+          <div className="text-center sm:text-left space-y-1">
+            <h2 className="text-lg sm:text-xl font-semibold">{user_email}</h2>
 
-              {user_name?.user_name_exist?.plan && (
-                <span className="p-1">
-                  Plan: {plan?.plan || user_name.user_name_exist.plan}
-                </span>
-              )}
-            </article>
-
-            {isProfileExists && (
-              <button
-                onClick={() => {
-                  setDeleteId(profileId);
-                  setShowDeleteConfirm(true);
-                }}
-                className="mt-2 px-3 py-1 text-xs bg-red-600 hover:bg-red-700 rounded-lg text-white"
-              >
-                Delete Profile
-              </button>
-            )}
-          </div>
-         
-        </div>
-        
- <div
-className={`${
-        theme === "dark"
-          ?  "bg-gradient-to-tl from-yellow-400 via-blue-200 to-orange-300 text-black" :"bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white"
-         
-      } shadow-xl rounded-xl p-4 `}
->
-  <p className="text-sm tracking-wide leading-relaxed flex items-center gap-2">
-    {bio_loading ? (
-      <LiaSpinnerSolid className="animate-spin text-lg opacity-70" />
-    ) : (
-      user_bio?.bio?.bio || "No bio added yet."
-    )}
-  </p>
-</div>
-        {/* FORM */}
-        <form
-          onSubmit={submitProfile}
-          className="space-y-4 border border-gray-700 p-4 rounded-xl"
-        >
-          {((isFreeUser && !hasUsername) || !isFreeUser) && (
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={isFreeUser ? "Create username" : "Update username"}
-                className="flex-1 px-4 py-2 rounded-lg dark:bg-gray-700 outline-none capitalize"
-              />
-
-              <button
-                // type="button"
-                disabled={userNameLoading}
-                onClick={(e) => {
-                  if (isFreeUser && !hasUsername) {
-                    create_user_name(e);
-                  } else if (!isFreeUser) {
-                    Update_user_name(e, user_name?.user_name_exist?._id);
-                  }
-                }}
-                className="sm:w-40 w-full py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-              >
-                {userNameLoading ? (
-                  <LiaSpinnerSolid className="mx-auto animate-spin" />
-                ) :isFreeUser 
-                ? (
-                  "Create"
-                ) : (
-                  "Update"
-                )}
-                
-              </button>
-            </div>
-          )}
-
-          {/* IMAGE */}
-          <div className="relative h-32 border border-dashed rounded-xl flex items-center justify-center hover:bg-gray-700/30 transition ">
-            <input
-              type="file"
-              accept="image/png,image/jpeg"
-              className="absolute inset-0 opacity-0 cursor-pointer"
-              onChange={handleFileChange}
-            />
-
-            <p className="text-sm text-blue-700">
-              {file ? file.name : "Choose profile image"}
+            <p className="flex justify-center sm:justify-start items-center gap-2 text-sm">
+              <FaUserTie />
+              <span className="capitalize font-semibold">{user_name}</span>
             </p>
-            <p className="text-sm text-blue-400 absolute top-1 capitalize ">{`Automatically resizes file size: ${file_size}MB`}</p>
+
+            <p className="flex justify-center sm:justify-start items-center gap-2 text-xs">
+              <FaCrown className="text-yellow-400" />
+              <span>Plan: {Plan || "free"}</span>
+            </p>
           </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={saveLoading}
-            className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-          >
-            {saveLoading ? (
-              <LiaSpinnerSolid className="mx-auto animate-spin" />
-            ) : isProfileExists ? (
-              "Update Profile"
-            ) : (
-              "Save Profile"
-            )}
-          </button>
-        </form>
+        <div className="border-t border-gray-700" />
 
-        {/* BIO */}
+        {/* ================= BASIC INFO ================= */}
+        <div className={`rounded-xl p-4 space-y-2 text-sm ${sectionBg}`}>
+          <h3 className="font-semibold text-base mb-2">📌 Basic Info</h3>
+
+          <p className="flex items-center gap-2">
+            <FaMapMarkerAlt />
+            <span>{location || "Location not added"}</span>
+          </p>
+
+          <p className="flex items-center gap-2">
+            <FaBriefcase />
+            <span>{profession || "Profession not added"}</span>
+          </p>
+
+          <p className="flex items-center gap-2">
+            <FaBriefcase />
+            <span>{company || "Company not added"}</span>
+          </p>
+        </div>
+
+        {/* ================= EDUCATION & SKILLS ================= */}
+        <div className={`rounded-xl p-4 space-y-2 text-sm ${sectionBg}`}>
+          <h3 className="font-semibold text-base mb-2">
+            🎓 Education & Skills
+          </h3>
+
+          <p className="flex items-center gap-2">
+            <FaGraduationCap />
+            <span>{education || "Education not added"}</span>
+          </p>
+
+          <p className="flex items-center gap-2">
+            <FaTools />
+            <span>{skills || "Skills not added"}</span>
+          </p>
+        </div>
+
+        {/* ================= BIO ================= */}
+        {plan?.plan &&
         <div>
-          <label className="block mb-2 text-sm">Bio</label>
-          {isFreeUser ? (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900">
-              <p>🚀 Bio is a Pro feature</p>
-              <Link to="/Dashboard/Billing">
-                <TbMoodEdit className="text-xl animate-pulse" />
-              </Link>
-            </div>
-          ) : (
-            <textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              rows="3"
-              className="w-full px-4 py-2 rounded-lg dark:bg-gray-700"
-            />
-          )}
-      { plan?.plan && <button
-  type="submit"
-  disabled={bio_loading}
-  className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-  onClick={
-    (e) => bio_create(e, user_bio?.bio?._id)
+          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+            📝 Bio
+          </h3>
 
-  }
->
-  {bio_loading ? (
-    <LiaSpinnerSolid className="mx-auto animate-spin" />
-  ) : user_bio?.bio?._id ? (
-    "Update bio"
-  ) : (
-    "Save bio"
-  )}
-</button>}
-        </div>
-      </div>
-
-      {/* DELETE MODAL */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-5 w-72 text-center">
-            <p className="text-red-600 font-semibold mb-4">
-              Delete this profile?
-            </p>
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-1 bg-red-600 text-white rounded"
-              >
-                {deleteLoading ? (
-                  <LiaSpinnerSolid className="animate-spin mx-auto" />
-                ) : (
-                  "Yes"
-                )}
-              </button>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-1 bg-gray-700 text-white rounded"
-              >
-                Cancel
-              </button>
-            </div>
+          <div
+            className={`rounded-xl p-4 text-sm leading-relaxed ${sectionBg}`}
+          >
+            {bio || "No bio added yet"}
           </div>
         </div>
-      )}
+}
+        {/* ================= LINKS ================= */}
+         {plan?.plan &&
+        <div className={`rounded-xl p-4 space-y-2 text-sm ${sectionBg}`}>
+          <h3 className="font-semibold text-base mb-2">🔗 Links</h3>
+
+          <p className="flex items-center gap-2">
+            <FaGlobe />
+            {website ? (
+              <a
+                href={website}
+                target="_blank"
+                className="text-blue-400 underline"
+              >
+                {website}
+              </a>
+            ) : (
+              "Website not added"
+            )}
+          </p>
+
+          <p className="flex items-center gap-2">
+            <FaGithub />
+            {github ? (
+              <a
+                href={github}
+                target="_blank"
+                className="text-blue-400 underline"
+              >
+                {github}
+              </a>
+            ) : (
+              "GitHub not added"
+            )}
+          </p>
+
+          <p className="flex items-center gap-2">
+            <FaLinkedin />
+            {linkedin ? (
+              <a
+                href={linkedin}
+                target="_blank"
+                className="text-blue-400 underline"
+              >
+                {linkedin}
+              </a>
+            ) : (
+              "LinkedIn not added"
+            )}
+          </p>
+        </div>}
+      </div>
     </div>
   );
 };
