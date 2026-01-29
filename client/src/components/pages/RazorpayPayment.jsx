@@ -55,6 +55,7 @@ const RazorpayPayment = () => {
       const { data } = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/project/create-order`,
         { amount: Number(amount) },
+        { withCredentials: true }
       );
 
       if (!data?.success || !data?.order) {
@@ -77,6 +78,7 @@ const RazorpayPayment = () => {
   try {
     const verifyRes = await axios.post(
       `${import.meta.env.VITE_API_URL}/api/project/verify-payment`,
+      { withCredentials: true },
       {
         razorpay_order_id: response.razorpay_order_id || order.id, // 🔥 fallback to created order id
         razorpay_payment_id: response.razorpay_payment_id,
