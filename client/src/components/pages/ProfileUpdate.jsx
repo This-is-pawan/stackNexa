@@ -105,18 +105,7 @@ const ProfileUpdate = () => {
   const create_professional_profile = async (e) => {
     e.preventDefault();
 
-    if (
-      !profession ||
-      !company ||
-      !education ||
-      !skills ||
-      !website ||
-      !github ||
-      !linkedin ||
-      (plan && !bio)
-    ) {
-      return toast.error("All professional fields are required");
-    }
+    
 
     try {
       setLoading(true);
@@ -218,7 +207,7 @@ const ProfileUpdate = () => {
         <form onSubmit={create_professional_profile} className="space-y-4">
           <h3 className="font-semibold">Professional Details</h3>
 
-          <input required value={profession} onChange={(e) => setProfession(e.target.value)} placeholder="Profession" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+          <input  value={profession} onChange={(e) => setProfession(e.target.value)} placeholder="Profession" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
           <input  value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
           <input  value={education} onChange={(e) => setEducation(e.target.value)} placeholder="Education" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
           <input value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Skills" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
