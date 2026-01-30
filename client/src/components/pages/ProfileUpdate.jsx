@@ -11,12 +11,13 @@ const ProfileUpdate = () => {
   /* ================= LOADING ================= */
   const [loading, setLoading] = useState(false);
 
-  /* ================= STATE ================= */
+  /* ================= BASIC STATE ================= */
   const [profile_image, setProfile_image] = useState(null);
   const [imageSize, setImageSize] = useState(null);
-
   const [location, setLocation] = useState("");
   const [name, setName] = useState("");
+
+  /* ================= PROFESSIONAL STATE ================= */
   const [company, setCompany] = useState("");
   const [education, setEducation] = useState("");
   const [bio, setBio] = useState("");
@@ -26,6 +27,14 @@ const ProfileUpdate = () => {
   const [profession, setProfession] = useState("");
   const [website, setWebsite] = useState("");
 
+  /* 🔥 TRACK ONLY CHANGED FIELDS */
+  const [dirtyFields, setDirtyFields] = useState({});
+
+  const markDirty = (field, setter) => (e) => {
+    setter(e.target.value);
+    setDirtyFields((prev) => ({ ...prev, [field]: true }));
+  };
+
   /* ================= IMAGE RESIZE ================= */
   const resizeImage = (file) => {
     return new Promise((resolve) => {
@@ -33,25 +42,19 @@ const ProfileUpdate = () => {
       const canvas = document.createElement("canvas");
       const reader = new FileReader();
 
-      reader.onload = (e) => {
-        img.src = e.target.result;
-      };
+      reader.onload = (e) => (img.src = e.target.result);
 
       img.onload = () => {
         const MAX_WIDTH = 500;
         const scale = MAX_WIDTH / img.width;
+
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scale;
 
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
 
         canvas.toBlob(
-          (blob) => {
-            resolve(
-              new File([blob], file.name, { type: file.type })
-            );
-          },
+          (blob) => resolve(new File([blob], file.name, { type: file.type })),
           file.type,
           0.8
         );
@@ -101,25 +104,28 @@ const ProfileUpdate = () => {
     }
   };
 
-  /* ================= PROFESSIONAL PROFILE ================= */
+  /* ================= PROFESSIONAL PROFILE (FIXED) ================= */
   const create_professional_profile = async (e) => {
     e.preventDefault();
-
-    
 
     try {
       setLoading(true);
 
-      const payload = {
-        company,
-        education,
-        bio,
-        github,
-        linkedin,
-        skills,
-        profession,
-        website,
-      };
+      const payload = {};
+
+      if (dirtyFields.profession) payload.profession = profession;
+      if (dirtyFields.company) payload.company = company;
+      if (dirtyFields.education) payload.education = education;
+      if (dirtyFields.skills) payload.skills = skills;
+      if (dirtyFields.website) payload.website = website;
+      if (dirtyFields.github) payload.github = github;
+      if (dirtyFields.linkedin) payload.linkedin = linkedin;
+      if (dirtyFields.bio) payload.bio = bio;
+
+      if (Object.keys(payload).length === 0) {
+        toast.info("No changes to update");
+        return;
+      }
 
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/project/profile/professional`,
@@ -127,7 +133,8 @@ const ProfileUpdate = () => {
         { withCredentials: true }
       );
 
-      toast.success(res.data?.message || "Profile saved");
+      toast.success(res.data?.message || "Profile updated");
+      setDirtyFields({});
       fetchProfiles();
     } catch (err) {
       toast.error(err?.response?.data?.message || "Failed");
@@ -165,7 +172,6 @@ const ProfileUpdate = () => {
               accept="image/png,image/jpeg"
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={handleImageChange}
-             
             />
             <p className="text-sm text-blue-400 font-medium">
               Choose profile image (Max 5MB)
@@ -178,59 +184,30 @@ const ProfileUpdate = () => {
           </div>
 
           <div className="space-y-4 mt-6">
-            <h3 className="font-semibold">Basic Information</h3>
-
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Username"
-              className="w-full px-4 py-3 rounded-xl bg-gray-800 outline-none capitalize"
-            
-            />
-
-            <input
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Location (Delhi, India)"
-              className="w-full px-4 py-3 rounded-xl bg-gray-800 outline-none"
-              required
-            />
-
-            <button disabled={loading} className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50">
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Username" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+            <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+            <button disabled={loading} className="w-full py-2 rounded-lg bg-blue-600">
               {loading ? <LiaSpinnerSolid className="mx-auto animate-spin" /> : "Save Basic Info"}
             </button>
           </div>
         </form>
 
         {/* ================= PROFESSIONAL ================= */}
-        {plan?.plan &&
-        <form onSubmit={create_professional_profile} className="space-y-4">
-          <h3 className="font-semibold">Professional Details</h3>
-
-          <input  value={profession} onChange={(e) => setProfession(e.target.value)} placeholder="Profession" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input  value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input  value={education} onChange={(e) => setEducation(e.target.value)} placeholder="Education" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Skills" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input  value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="Website" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input  value={github} onChange={(e) => setGithub(e.target.value)} placeholder="GitHub" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-          <input  value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="LinkedIn" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
-
-          {plan && (
-            <textarea
-         
-              rows="4"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="Write your bio..."
-              className="w-full px-4 py-3 rounded-xl bg-gray-800 resize-none"
-            />
-          )}
-
-          <button disabled={loading} className="w-full py-2 rounded-lg bg-green-600 hover:bg-green-700 disabled:opacity-50">
-            {loading ? <LiaSpinnerSolid className="mx-auto animate-spin" /> : "Save Profile Details"}
-          </button>
-        </form>
-}
+        {plan?.plan && (
+          <form onSubmit={create_professional_profile} className="space-y-4">
+            <input value={profession} onChange={markDirty("profession", setProfession)} placeholder="Profession" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+            <input value={company} onChange={markDirty("company", setCompany)} placeholder="Company" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+            <input value={education} onChange={markDirty("education", setEducation)} placeholder="Education" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+            <input value={skills} onChange={markDirty("skills", setSkills)} placeholder="Skills" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+            <input value={website} onChange={markDirty("website", setWebsite)} placeholder="Website" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+            <input value={github} onChange={markDirty("github", setGithub)} placeholder="GitHub" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+            <input value={linkedin} onChange={markDirty("linkedin", setLinkedin)} placeholder="LinkedIn" className="w-full px-4 py-3 rounded-xl bg-gray-800" />
+            <textarea value={bio} onChange={markDirty("bio", setBio)} rows="4" placeholder="Write your bio..." className="w-full px-4 py-3 rounded-xl bg-gray-800 resize-none" />
+            <button disabled={loading} className="w-full py-2 rounded-lg bg-green-600">
+              {loading ? <LiaSpinnerSolid className="mx-auto animate-spin" /> : "Save Profile Details"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

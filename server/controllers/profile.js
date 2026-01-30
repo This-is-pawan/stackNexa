@@ -47,14 +47,36 @@ const createProfessionalProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
 
+    const updates = {};
+    const unsets = {};
+
+    Object.keys(req.body).forEach((key) => {
+      const value = req.body[key];
+
+      if (value === "" || value === null || value === undefined) {
+        unsets[key] = "";
+      } else {
+        updates[key] = value;
+      }
+    });
+
+    const updateQuery = {};
+    if (Object.keys(updates).length) updateQuery.$set = updates;
+    if (Object.keys(unsets).length) updateQuery.$unset = unsets;
+
     const profile = await UserNameModel.findOneAndUpdate(
       { user: userId },
-      { ...req.body },
+      updateQuery,
       { new: true, upsert: true }
     );
 
-    res.status(200).json({ success: true, profile });
+    res.status(200).json({
+      success: true,
+      message: "Professional profile updated",
+      profile,
+    });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false });
   }
 };
