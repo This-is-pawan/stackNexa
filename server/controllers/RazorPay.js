@@ -101,7 +101,7 @@ const payment_receipt = async (req, res) => {
     if (!latestPayment)
       return res.status(404).json({ success: false, message: "No payment found" });
 
-    console.log("📄 Latest Payment:", latestPayment);
+   
     return res.status(200).json({ success: true, result: latestPayment });
   } catch (err) {
     console.error("Payment Receipt Error:", err);

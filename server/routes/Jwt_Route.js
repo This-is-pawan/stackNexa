@@ -8,6 +8,7 @@ const {
   isAuthenticated,
   verifyLoginOtp,
   change_password,
+  allusers,
 } = require("../controllers/Jwt_Auth_controller");
 
 const Verify = require("../middleware/Jwtmiddleware");
@@ -23,6 +24,8 @@ router.post("/register", Register);
 router.post("/login", Login);
 router.post("/logout", Logout);
 router.get("/authenticated", Verify, isAuthenticated);
+router.get("/authenticated", Verify, isAuthenticated);
+router.get("/allusers", Verify, allusers);
 router.post("/verify-otp", verifyLoginOtp);
 
 // payment

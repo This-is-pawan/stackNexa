@@ -251,6 +251,24 @@ const GoogleAllUsers = async (req, res) => {
     });
   }
 };
+const allusers = async (req, res) => {
+  try {
+
+    const users = await JWTUser.find().select("-password");
+
+    return res.status(200).json({
+      success: true,
+      count: users.length,
+      users
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 
 const change_password = async (req, res) => {
   const { password, new_password, confirm_password } = req.body;
@@ -310,4 +328,4 @@ const change_password = async (req, res) => {
 };
 
 
-module.exports = { Register, Login, Logout, isAuthenticated, verifyLoginOtp,GoogleAllUsers,change_password };
+module.exports = { Register, Login, Logout, isAuthenticated, verifyLoginOtp,GoogleAllUsers,change_password ,allusers};

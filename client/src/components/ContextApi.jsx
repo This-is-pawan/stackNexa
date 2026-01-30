@@ -108,6 +108,7 @@ const ContextApi = ({ children }) => {
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/project/allusers`,
       );
+console.log(data);
 
       if (data?.success) {
         setRegisterUsers(data.users || []);
@@ -188,7 +189,7 @@ const ContextApi = ({ children }) => {
         `${import.meta.env.VITE_API_URL}/api/project/payment-receipt`,
         { withCredentials: true },
       );
-      console.log(result);
+     
       
       if (result.data.success) {
         setPlan(result?.data?.result);
