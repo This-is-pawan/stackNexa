@@ -6,7 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const Setting = () => {
-  const { theme, user, setBar,setOpen, auth ,setAuth,plan} = useAppContext();
+  const { theme, user, setBar,setOpen, auth ,setAuth,plan,  plan_loading} = useAppContext();
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [showSecurityCheck, setShowSecurityCheck] = useState(false);
   const [name, setName] = useState("");
@@ -104,12 +104,13 @@ useEffect(() => {
 
             <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow">
               <h2 className="text-xl font-semibold mb-3">Subscription</h2>
-              <p>
+             {plan_loading?(<LiaSpinnerSolid/>):
+             (<p>
                 Current Plan:
                 <span className="ml-2 font-bold text-blue-600">
                   {plan?.plan || "Free"}
                 </span>
-              </p>
+              </p>)}
 
               <Link
                 to="/dashboard/billing"

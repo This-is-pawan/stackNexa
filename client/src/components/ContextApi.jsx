@@ -254,7 +254,7 @@ const ContextApi = ({ children }) => {
         setVeified,
         checkAuth,
         plan,
-        plan_loading,
+        plan_loading, 
         payment_reciept,
         fetchProfiles,
         profileLoading,

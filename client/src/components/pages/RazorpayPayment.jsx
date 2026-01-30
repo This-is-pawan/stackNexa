@@ -23,7 +23,7 @@ const loadRazorpay = () => {
 };
 
 const RazorpayPayment = () => {
-  const { theme } = useAppContext();
+  const { theme, payment_reciept  } = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -98,6 +98,7 @@ const RazorpayPayment = () => {
               return;
             }
 
+            await payment_reciept() 
             toast.success("Payment Successful 🎉");
             navigate("/receipt", { state: payment });
           } catch (err) {
