@@ -7,7 +7,7 @@ const session = require("express-session");
 const passport = require("passport");
 const MongoStore=require('connect-mongo').default;
 const connection = require("./config/DBFile");
-const { router } = require("./routes/Jwt_Route");
+const  router  = require("./routes/Jwt_Route");
 const profileRoutes = require("./routes/profile_route");
 
 require("./config/GoogleAuth");

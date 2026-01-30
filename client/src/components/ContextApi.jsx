@@ -185,9 +185,11 @@ const ContextApi = ({ children }) => {
     setPlan_loading(true);
     try {
       const result = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/project/payment-reciept`,
+        `${import.meta.env.VITE_API_URL}/api/project/payment-receipt`,
         { withCredentials: true },
       );
+      console.log(result);
+      
       if (result.data.success) {
         setPlan(result?.data?.result);
       } else {

@@ -1,14 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../components/ContextApi";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import axios from "axios";
+
 const ReceiptPage = () => {
   const { theme } = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
-  const receipt = location.state;
 
+  // 1️⃣ State-based receipt (for refresh safety)
+  const [receipt, setReceipt] = useState(location.state || null);
+  const [loading, setLoading] = useState(false);
 
+  /* ================= FETCH FROM DB IF NOT FOUND ================= */
+  useEffect(() => {
+    if (receipt) return;
+
+    const fetchReceipt = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/project/payment-receipt`,
+          { withCredentials: true }
+        );
+
+        if (res.data?.success && res.data.result) {
+          setReceipt(res.data.result);
+        }
+      } catch (err) {
+        console.error("Receipt fetch failed", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReceipt();
+  }, [receipt]);
+
+  /* ================= NO DATA ================= */
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Loading receipt...
+      </div>
+    );
+  }
 
   if (!receipt) {
     return (
@@ -18,7 +55,7 @@ const ReceiptPage = () => {
     );
   }
 
-  const paymentDate = new Date().toLocaleString();
+  const paymentDate = new Date(receipt.createdAt || Date.now()).toLocaleString();
 
   return (
     <div
@@ -50,13 +87,16 @@ const ReceiptPage = () => {
             <span
               className={
                 receipt.status === "Success"
-                  ? "text-green-600 font-bold flex items-center "
-                  : "text-red-600 font-bold flex items-center "
+                  ? "text-green-600 font-bold flex items-center"
+                  : "text-red-600 font-bold flex items-center"
               }
             >
-              
               {receipt.status}
-         <span>{receipt.status==='Success'? <FaCheckCircle className="text-xs ml-1"/>:<FaTimesCircle className="text-xs ml-1"/> }</span>
+              {receipt.status === "Success" ? (
+                <FaCheckCircle className="text-xs ml-1" />
+              ) : (
+                <FaTimesCircle className="text-xs ml-1" />
+              )}
             </span>
           </Row>
 
@@ -83,6 +123,14 @@ const ReceiptPage = () => {
           <Row label="Date">
             <span>{paymentDate}</span>
           </Row>
+
+          <Row label="Month">
+            <span>{receipt.month || "—"}</span>
+          </Row>
+
+          <Row label="Year">
+            <span>{receipt.year || "—"}</span>
+          </Row>
         </div>
 
         {/* Footer */}
@@ -105,7 +153,7 @@ const ReceiptPage = () => {
   );
 };
 
-/* Reusable Row Component */
+/* ================= ROW COMPONENT ================= */
 const Row = ({ label, children }) => (
   <div className="flex justify-between items-start gap-4">
     <span className="font-semibold text-gray-600 dark:text-gray-300">
