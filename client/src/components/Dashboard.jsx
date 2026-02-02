@@ -69,7 +69,8 @@ const Dashboard = () => {
           >
             {/* TOGGLE ICON */}
             <button
-              onClick={() => {setSideBar(!sideBar)
+              onClick={() => {
+                setSideBar(!sideBar)
                 
               }
               }

@@ -125,22 +125,38 @@ const ContextApi = ({ children }) => {
     }
   }, [auth.isAuthenticated]);
   // reviews,comment
-const [review_comment,setReview_comment]=useState([])
-const [review_loading,setReview_loading]=useState(false)
-const Reveiw_Comment=async () => {
+const [review_comment, setReview_comment] = useState([]);
+const [review_loading, setReview_loading] = useState(false);
+
+const fetch_comment = async () => {
   try {
-    setReview_loading(true)
-    const result=await axios.get(`${import.meta.env.VITE_API_URL}/api/project/auth-reviews`,{withCredentials:true})
-    if (result?.data) {
-      setReview_comment(result?.data)
-    }
-  } catch (error) {
-    console.log(error);
-    
-  }finally{
-    setReview_loading(false)
+    setReview_loading(true);
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/project/auth-reviews`,
+      { withCredentials: true }
+    );
+    setReview_comment(res?.data?.reviews || res?.data || []);
+  } finally {
+    setReview_loading(false);
   }
-}
+};
+
+/* 🌍 ALL USERS */
+const [users_reviews, setUsers_reviews] = useState([]);
+const [usersReviewsLoading, setUsersReviewsLoading] = useState(false);
+
+const AllUser_reviews = async () => {
+  try {
+    setUsersReviewsLoading(true);
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/project/all-reviews`
+    );
+    setUsers_reviews(res?.data?.reviews || res?.data || []);
+  } finally {
+    setUsersReviewsLoading(false);
+  }
+};
+
 
 
   /* ================= GOOGLE AUTH ================= */
@@ -264,9 +280,10 @@ const allusers_profile=async () => {
   /* ================= INIT ================= */
   useEffect(() => {
     fetchProfiles();
-    Reveiw_Comment()
+    fetch_comment();
     payment_reciept();
-    allusers_profile()
+    allusers_profile();
+    AllUser_reviews();
   }, []);
 
   return (
@@ -303,6 +320,10 @@ const allusers_profile=async () => {
         review_comment,
         setReview_comment,
         review_loading,
+        users_reviews,
+        setUsers_reviews,
+         AllUser_reviews,
+          setUsersReviewsLoading,
       }}
     >
       {children}
@@ -311,3 +332,6 @@ const allusers_profile=async () => {
 };
 
 export default ContextApi;
+
+   
+  

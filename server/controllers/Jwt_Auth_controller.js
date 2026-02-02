@@ -340,7 +340,6 @@ const createReview = async (req, res) => {
   }
 };
 
-
 /* ================= UPDATE REVIEW ================= */
 const updateReview = async (req, res) => {
   try {
@@ -375,8 +374,6 @@ const updateReview = async (req, res) => {
 };
 
 /// ================= DELETE REVIEW =================
-
-
 const deleteReview = async (req, res) => {
   try {
     // Ensure user is authenticated
@@ -405,19 +402,6 @@ const deleteReview = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
