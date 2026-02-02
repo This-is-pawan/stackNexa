@@ -235,7 +235,7 @@ const Reveiw_Comment=async () => {
         { withCredentials: true },
       );
       setProfiles(res?.data);
-      
+      return res.data;
     } catch (err) {
       console.error("Profile fetch error", err);
     } finally {
@@ -254,8 +254,7 @@ const allusers_profile=async () => {
         { withCredentials: true },
       );
      setAll_Profiles(res?.data);
-     
-      
+    
     } catch (err) {
       console.error("Profile fetch error", err);
     } finally {

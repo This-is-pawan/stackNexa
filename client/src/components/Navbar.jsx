@@ -29,6 +29,7 @@ const Navbar = () => {
     setGoogleUser,
     setVeified,
     profiles,
+    setAll_Profiles
   } = useAppContext();
 const profileImage = profiles?.image?.image?.url || default_user_image;
   const navigate = useNavigate();
@@ -44,20 +45,21 @@ const profileImage = profiles?.image?.image?.url || default_user_image;
     try {
       setLoading(true);
 
-      await axios.post(
+      const res=await axios.post(
         `${import.meta.env.VITE_API_URL}/api/project/logout`,
         {},
         { withCredentials: true }
       );
 
       setAuth({ user: null, isAuthenticated: false, loading: false });
+      // setAll_Profiles(null);
       setVeified(true);
       setOpen(false);
-
       toast.success("Logged out successfully");
       navigate("/");
-    } catch {
-      toast.error("Logout failed");
+      setAll_Profiles(null)
+    } catch (error) {
+      toast.error(error||res.data.message);
     } finally {
       setLoading(false);
     }

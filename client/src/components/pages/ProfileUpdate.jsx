@@ -3,10 +3,11 @@ import { LiaSpinnerSolid } from "react-icons/lia";
 import { useAppContext } from "../ContextApi";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const ProfileUpdate = () => {
   const { theme, plan, fetchProfiles } = useAppContext();
-
+const navigate=useNavigate()
   /* ================= LOADING ================= */
   const [loading, setLoading] = useState(false);
 
@@ -73,6 +74,7 @@ const ProfileUpdate = () => {
 
       toast.success(res.data?.message || "Basic profile updated");
       fetchProfiles();
+      navigate('/dashboard/setting/profile')
     } catch (err) {
       toast.error(err?.response?.data?.message || "Failed");
     } finally {

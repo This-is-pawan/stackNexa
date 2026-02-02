@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { theme, setAuth ,setBar, checkAuth} = useAppContext();
+  const { theme, setAuth ,setBar, checkAuth,fetchProfiles,profiles} = useAppContext();
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -30,8 +30,10 @@ const Login = () => {
         loading: false,
       });
 await checkAuth();
-      toast.success("Login successful");
-      navigate("/dashboard");
+await fetchProfiles();
+toast.success("Login successful");
+
+navigate("/dashboard");
     } catch (err) {
       toast.error(err?.response?.data?.message || "Login failed");
     } finally {
