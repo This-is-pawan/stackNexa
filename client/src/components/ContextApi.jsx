@@ -237,6 +237,14 @@ const AllUser_reviews = async () => {
     }
   };
   //
+useEffect(() => {
+  if (auth?.isAuthenticated) {
+    payment_reciept();
+  } else {
+    setPlan(null);
+    setPlan_loading(false);
+  }
+}, [auth?.isAuthenticated]);
 
   /* ================= PROFILE ================= */
   const [profiles, setProfiles] = useState(null);
@@ -278,10 +286,10 @@ const allusers_profile=async () => {
     }
 }
   /* ================= INIT ================= */
+  
   useEffect(() => {
     fetchProfiles();
     fetch_comment();
-    payment_reciept();
     allusers_profile();
     AllUser_reviews();
   }, []);

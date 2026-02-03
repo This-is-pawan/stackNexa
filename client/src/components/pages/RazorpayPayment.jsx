@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -23,7 +23,7 @@ const loadRazorpay = () => {
 };
 
 const RazorpayPayment = () => {
-  const { theme, payment_reciept  } = useAppContext();
+  const { theme, payment_reciept } = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -32,7 +32,8 @@ const RazorpayPayment = () => {
   // ✅ FORCE LOWERCASE (ENUM SAFE)
   const planName = (location.state?.planName || "pro").toLowerCase();
 
-  const isProcessing = useRef(false);
+  // 🔥 FIX: useState instead of useRef
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePay = async () => {
     if (!amount || amount <= 0) {
@@ -40,15 +41,15 @@ const RazorpayPayment = () => {
       return;
     }
 
-    if (isProcessing.current) return;
-    isProcessing.current = true;
+    if (isProcessing) return;
+    setIsProcessing(true);
 
     try {
       /* 1️⃣ Load Razorpay */
       const loaded = await loadRazorpay();
       if (!loaded) {
         toast.error("Razorpay SDK failed to load");
-        isProcessing.current = false;
+        setIsProcessing(false);
         return;
       }
 
@@ -61,7 +62,7 @@ const RazorpayPayment = () => {
 
       if (!data?.success || !data?.order) {
         toast.error("Order creation failed");
-        isProcessing.current = false;
+        setIsProcessing(false);
         return;
       }
 
@@ -85,7 +86,7 @@ const RazorpayPayment = () => {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
                 amount,
-                plan: planName,        // ✅ enum-safe
+                plan: planName,
                 duration: "monthly",
               },
               { withCredentials: true }
@@ -98,20 +99,20 @@ const RazorpayPayment = () => {
               return;
             }
 
-            await payment_reciept() 
+            await payment_reciept();
             toast.success("Payment Successful 🎉");
             navigate("/receipt", { state: payment });
           } catch (err) {
             console.error(err);
             toast.error("Payment verification failed");
           } finally {
-            isProcessing.current = false;
+            setIsProcessing(false);
           }
         },
 
         modal: {
           ondismiss: () => {
-            isProcessing.current = false;
+            setIsProcessing(false);
           },
         },
 
@@ -126,7 +127,7 @@ const RazorpayPayment = () => {
     } catch (error) {
       console.error(error);
       toast.error("Payment failed. Try again.");
-      isProcessing.current = false;
+      setIsProcessing(false);
     }
   };
 
@@ -155,10 +156,10 @@ const RazorpayPayment = () => {
 
         <button
           onClick={handlePay}
-          disabled={isProcessing.current}
+          disabled={isProcessing}
           className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg font-semibold disabled:opacity-50"
         >
-          {isProcessing.current ? "Processing..." : `Pay ₹${amount}`}
+          {isProcessing ? "Processing..." : `Pay ₹${amount}`}
         </button>
 
         <Link to="/dashboard/billing">

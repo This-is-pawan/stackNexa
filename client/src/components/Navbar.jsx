@@ -29,7 +29,9 @@ const Navbar = () => {
     setGoogleUser,
     setVeified,
     profiles,
-    setAll_Profiles
+    setAll_Profiles,
+      setPlan,
+      setUsers_reviews
   } = useAppContext();
 const profileImage = profiles?.image?.image?.url || default_user_image;
   const navigate = useNavigate();
@@ -58,6 +60,8 @@ const profileImage = profiles?.image?.image?.url || default_user_image;
       toast.success("Logged out successfully");
       navigate("/");
       setAll_Profiles(null)
+      setPlan(null)
+      setUsers_reviews(null)
     } catch (error) {
       toast.error(error||res.data.message);
     } finally {
