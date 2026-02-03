@@ -1,13 +1,12 @@
-import React from 'react'
+// components/GlobalLoading.jsx
+import React from "react";
 
-const GloblaLoading = () => {
+const GlobalLoading = () => {
   return (
-    <div>
-      <div className="h-screen w-screen flex items-center justify-center bg-black">
-    <span className="loader"></span>
-  </div>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black">
+      <div className="h-14 w-14 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
     </div>
-  )
-}
+  );
+};
 
-export default GloblaLoading
+export default GlobalLoading;

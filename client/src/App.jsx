@@ -41,8 +41,14 @@ import Certificate from "./components/pages/Certificate"
 const App = () => {
   const { theme, auth, Googleuser, verified } = useAppContext();
 
-  const loading = auth?.loading || Googleuser?.loading;
-  if (loading) return <GlobalLoading />;
+   const isLoading =
+    auth?.loading === true ||
+    Googleuser?.loading === true ||
+    auth === undefined;
+
+  if (isLoading) {
+    return <GlobalLoading />;
+  }
 
   const isAuth = auth?.isAuthenticated || Googleuser?.isAuthenticated;
 
